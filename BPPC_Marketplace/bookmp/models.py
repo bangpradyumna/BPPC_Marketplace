@@ -31,10 +31,11 @@ class Profile(models.Model):
 
 	user = models.OneToOneField(User,on_delete=models.CASCADE,related_name='profile')
 	bits_id = models.CharField(max_length=13,null=False)
-	year=models.IntegerField(choices=YEAR_CHOICES)
+	year = models.IntegerField(choices=YEAR_CHOICES)
 	is_dual_degree = models.BooleanField(default=False)
 	single_branch = models.CharField(max_length=100,choices=SINGLE_DEGREE_BRANCH_CHOICES)
-	dual_branch= models.CharField(max_length=100,choices=DUAL_DEGREE_BRANCH_CHOICES,null=True)
+	dual_branch = models.CharField(max_length=100,choices=DUAL_DEGREE_BRANCH_CHOICES,null=True)
+	new_bitsian = models.BooleanField(default=True) # Keep false for incoming batch.
 
 	def __str__(self):
 		return 'Profile for user {}'.format(self.user.username)

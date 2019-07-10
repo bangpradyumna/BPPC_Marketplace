@@ -125,11 +125,18 @@ def login(request):
                "display_message": "Something went wrong. Please contact a DVM Official.",
             }, status=400)
 
+    if user.profile.new_bitsian:
+        new_bitsian = True
+        user.profile.new_bitsian = False
+    else:
+        new_bitsian = False
+
     payload = {
     "JWT": get_jwt_with_user(user),
     "user_id": user.id,
     "name": user.first_name + user.last_name,
     "email": user.email,
+    "new_bitsian": new_bitsian,
     }
     if auth_mode == 2:
         payload["bitsian_id"] = profile.bits_id
