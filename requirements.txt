@@ -4,6 +4,7 @@ chardet==3.0.4
 Django==2.2.3
 djangorestframework==3.9.4
 djangorestframework-jwt==1.11.0
+django-cors-headers==3.0.2
 google-auth==1.6.2
 gunicorn==19.9.0
 idna==2.8

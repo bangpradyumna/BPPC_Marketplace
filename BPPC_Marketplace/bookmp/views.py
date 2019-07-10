@@ -39,7 +39,9 @@ def login(request):
                 "detail": message,
                 "display_message": message
             }
-            return Response(payload, status=400)
+            response =  Response(payload, status=400)
+            response.delete_cookie('sessionid')
+            return response
             
 
     if auth_mode == 1:
@@ -52,8 +54,10 @@ def login(request):
                 "detail": message,
                 "display_message": message
             }
-            return Response(payload, status=401)
-
+            response =  Response(payload, status=401)
+            response.delete_cookie('sessionid')
+            return response
+            
     elif auth_mode == 2:
         try:
             try:
@@ -64,14 +68,19 @@ def login(request):
                     "detail": message,
                     "diaplay_message": "Something went wrong. Please try again." 
                 }
-                return Response(payload, status=403)
+                response =  Response(payload, status=403)
+                response.delete_cookie('sessionid')
+                return response
+
             if idinfo["iss"] not in ["accounts.google.com", "https://accounts.google.com"]:
                 message = "Not a valid Google account."
                 payload = {
                     "detail": message,
                     "diaplay_message": message 
                 }
-                return Response(payload, status=403)
+                response =  Response(payload, status=403)
+                response.delete_cookie('sessionid')
+                return response
 
             email = idinfo["email"]
 
@@ -85,8 +94,10 @@ def login(request):
                     "detail": message,
                     "diaplay_message": message 
                 }
-                return Response(payload, status=403)
-                
+                response =  Response(payload, status=403)
+                response.delete_cookie('sessionid')
+                return response
+
             try:
                 user = User.objects.get(email=email)
             
@@ -119,11 +130,13 @@ def login(request):
 
         except KeyError as missing_key:
             message = "Google OAuth configured improperly on the client end. Required key: %s." % missing_key
-            return Response({
+            response =  Response({
                "detail": message,
                "idinfo": idinfo,
                "display_message": "Something went wrong. Please contact a DVM Official.",
             }, status=400)
+            response.delete_cookie('sessionid')
+            return response
 
     if user.profile.new_bitsian:
         new_bitsian = True
@@ -144,8 +157,9 @@ def login(request):
         payload["bitsian_id"] = ""
 
 
-    return Response(payload, status=200)
-
+    response =  Response(payload, status=200)
+    response.delete_cookie('sessionid')
+    return response
 
 
 
