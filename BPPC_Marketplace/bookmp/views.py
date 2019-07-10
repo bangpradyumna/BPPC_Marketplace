@@ -125,16 +125,16 @@ def login(request):
                "display_message": "Something went wrong. Please contact a DVM Official.",
             }, status=400)
 
-        payload = {
-        "JWT": get_jwt_with_user(user),
-        "user_id": user.id,
-        "name": user.first_name + user.last_name,
-        "email": user.email,
-        }
-        if auth_mode == 2:
-            payload["bitsian_id"] = profile.bits_id
-        else:
-            payload["bitsian_id"] = ""
+    payload = {
+    "JWT": get_jwt_with_user(user),
+    "user_id": user.id,
+    "name": user.first_name + user.last_name,
+    "email": user.email,
+    }
+    if auth_mode == 2:
+        payload["bitsian_id"] = profile.bits_id
+    else:
+        payload["bitsian_id"] = ""
 
 
     return Response(payload, status=200)
