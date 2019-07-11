@@ -124,9 +124,17 @@ def login(request):
 
                 profile = Profile()
                 profile.user = user
+                
                 # Extracting year from email, would have to be updated yearly.
                 # Or we can just ask the user for his year.
-                profile.year = 2020 - int(email[0:4])
+                # profile.year = 2020 - int(email[0:4])
+
+            try:
+                profile = user.profile
+            except:
+                profile = Profile()
+                profile.user = user
+                profile.save()
 
         except KeyError as missing_key:
             message = "Google OAuth configured improperly on the client end. Required key: %s." % missing_key
