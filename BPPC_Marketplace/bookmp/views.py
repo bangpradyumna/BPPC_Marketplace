@@ -153,6 +153,7 @@ def login(request):
     if user.profile.new_bitsian:
         new_bitsian = True
         user.profile.new_bitsian = False
+        user.profile.save()
     else:
         new_bitsian = False
 
