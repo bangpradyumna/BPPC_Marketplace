@@ -134,7 +134,7 @@ def login(request):
             except:
                 profile = Profile()
                 profile.user = user
-                profile.year = 2020 - int(email[0:4])
+                profile.year = 2020 - int(email[1:4])
                 profile.save()
 
         except KeyError as missing_key:
