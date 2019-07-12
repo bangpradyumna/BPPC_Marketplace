@@ -13,6 +13,9 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 import os
 from . import keyconfig
 
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -144,3 +147,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 CORS_ORIGIN_ALLOW_ALL = True
 USE_X_FORWARDED_HOST = True
 
+# Sentry Initialization
+sentry_sdk.init(
+    dsn="https://834de5cb0fa74d7ea01c760f06cfda1f@sentry.io/1503600",
+    integrations=[DjangoIntegration()]
+)
