@@ -155,7 +155,7 @@ def login(request):
     payload = {
     "JWT": get_jwt_with_user(user),
     "user_id": user.id,
-    "name": user.first_name + user.last_name,
+    "name": user.first_name + ' ' + user.last_name,
     "email": user.email,
     "new_bitsian": new_bitsian,
     }
