@@ -10,6 +10,8 @@ from rest_framework.decorators import api_view
 from .models import Profile
 from .utils import generate_random_password, get_jwt_with_user
 
+CURRENT_YEAR=2019
+
 @csrf_exempt
 @api_view(['POST'])
 def login(request):
@@ -127,7 +129,7 @@ def login(request):
                 
                 # Extracting year from email, would have to be updated yearly.
                 # Or we can just ask the user for his year.
-                profile.year = 2020 - int(email[1:4])
+                profile.year = CURRENT_YEAR - int(email[1:4]) + 1 # CURRENT_YEAR variable must be be set on the top of this file. 
                 profile.save()
 
             try:
@@ -135,7 +137,7 @@ def login(request):
             except:
                 profile = Profile()
                 profile.user = user
-                profile.year = 2020 - int(email[1:4])
+                profile.year = CURRENT_YEAR - int(email[1:4]) + 1 # CURRENT_YEAR variable must be be set on the top of this file. 
                 profile.save()
 
         except KeyError as missing_key:
