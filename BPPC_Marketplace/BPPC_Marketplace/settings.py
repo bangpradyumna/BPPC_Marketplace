@@ -150,5 +150,6 @@ USE_X_FORWARDED_HOST = True
 # Sentry Initialization
 sentry_sdk.init(
     dsn="https://834de5cb0fa74d7ea01c760f06cfda1f@sentry.io/1503600",
-    integrations=[DjangoIntegration()]
+    integrations=[DjangoIntegration()],
+    send_default_pii=True
 )
