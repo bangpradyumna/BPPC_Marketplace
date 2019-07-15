@@ -59,6 +59,16 @@ def login(request):
             response =  Response(payload, status=401)
             response.delete_cookie('sessionid')
             return response
+        else:
+            # Create profile if it doesn't exist.
+            try: 
+                profile = user.profile
+            except:
+                profile = Profile()
+                profile.user = user
+                profile.year = 1
+                profile.new_bitsian = False
+                profile.save()
             
     elif auth_mode == 2:
         try:
