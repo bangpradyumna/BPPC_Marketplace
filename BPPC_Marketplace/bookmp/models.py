@@ -29,6 +29,11 @@ class Profile(models.Model):
 		('B5','M.Sc. Physics'),
 	)
 	
+	GENDER = (
+		('M','MALE'),
+		('F','FEMALE')
+	)
+
 	HOSTELS = (
 		('RM','Ram Bhawan'),
 		('BUDH','Budh Bhawan'),
@@ -60,6 +65,7 @@ class Profile(models.Model):
 	)
 
 	user = models.OneToOneField(User,on_delete=models.CASCADE,related_name='profile')
+	gender = models.CharField(max_length=6,null = False)
 	bits_id = models.CharField(max_length=13,null=False,unique=True)
 	year = models.IntegerField(choices=YEAR_CHOICES)
 	is_dual_degree = models.BooleanField(default=False)

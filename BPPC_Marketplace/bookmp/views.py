@@ -199,6 +199,7 @@ def signup(request):
         except IndexError:
             last_name = ''
         
+        gender = str(request.data["gender"])
         username = str(request.data["username"])
         password = str(request.data["password"])    
         email = str(request.data["email"]) 
@@ -260,6 +261,7 @@ def signup(request):
                     )
             user_profile = Profile.objects.create( # TODO: Catch Exceptions due to this command like user profile for this name etc already exist
                         user = user,
+                        gender = gender,
                         bits_id = bits_id,
                         year = 1,
                         is_dual_degree = is_dual_degree,
