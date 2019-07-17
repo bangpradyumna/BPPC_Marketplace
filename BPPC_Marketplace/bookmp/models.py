@@ -11,32 +11,64 @@ class Profile(models.Model):
 	)
 	
 	SINGLE_DEGREE_BRANCH_CHOICES = (
-		('CHEMENGG','B.E. Chemical'),
-		('CIVILENGG','B.E. Civil'),
-		('CS','B.E. Computer Science'),
-		('EEE','B.E. Electrical & Electronics'),
-		('ENI','B.E. Electronics & Instrumentation'),
-		('MECHENGG','B.E. Mechanical'),
-		('MANUENGG','B.E. Manufacturing'),
-		('BPHARMA','B.Pharm.'),
+		('A1','B.E. Chemical'),
+		('A2','B.E. Civil'),
+		('A7','B.E. Computer Science'),
+		('A3','B.E. Electrical & Electronics'),
+		('A8','B.E. Electronics & Instrumentation'),
+		('A4','B.E. Mechanical'),
+		('AB','B.E. Manufacturing'),
+		('A5','B.Pharm.'),
 	)
 
 	DUAL_DEGREE_BRANCH_CHOICES = (
-		('BIO','M.Sc. Biological Sciences'),
-		('CHEM','M.Sc. Chemistry'),
-		('ECO','M.Sc. Economics'),
-		('MATHS','M.Sc. Mathematics'),
-		('PHY','M.Sc. Physics'),
+		('B1','M.Sc. Biological Sciences'),
+		('B2','M.Sc. Chemistry'),
+		('B3','M.Sc. Economics'),
+		('B4','M.Sc. Mathematics'),
+		('B5','M.Sc. Physics'),
+	)
+	
+	HOSTELS = (
+		('RM','Ram Bhawan'),
+		('BUDH','Budh Bhawan'),
+		('SR-A','Srinivasa Ramanujan A'),
+		('SR-B','Srinivasa Ramanujan B'),
+		('SR-C','Srinivasa Ramanujan C'),
+		('SR-D','Srinivasa Ramanujan D'),
+		('KR','Krishna Bhawan'),
+		('GN','Gandhi Bhawan'),
+		('SK','Shankar Bhawan'),
+		('VY','Vyas Bhawan'),
+		('VK','Vishwakarma Bhawan'),
+		('BG','Bhagirath Bhawan'),
+		('RP','Rana Pratap Bhawan'),
+		('AK','Ashok Bhawan'),
+		('MV-A','Malviya-A Bhawan'),
+		('MV-B','Malviya-B Bhawan'),
+		('MV-C','Malviya-C Bhawan'),
+		('MR-1','Meera Bhawan Block-1'),
+		('MR-2','Meera Bhawan Block-2'),
+		('MR-3','Meera Bhawan Block-3'),
+		('MR-4','Meera Bhawan Block-4'),
+		('MR-5','Meera Bhawan Block-5'),
+		('MR-6','Meera Bhawan Block-6'),
+		('MR-7','Meera Bhawan Block-7'),
+		('MR-8','Meera Bhawan Block-8'),
+		('MR-9','Meera Bhawan Block-9'),
+		('MR-10','Meera Bhawan Block-10'),
 	)
 
 	user = models.OneToOneField(User,on_delete=models.CASCADE,related_name='profile')
-	bits_id = models.CharField(max_length=13,null=False)
+	bits_id = models.CharField(max_length=13,null=False,unique=True)
 	year = models.IntegerField(choices=YEAR_CHOICES)
 	is_dual_degree = models.BooleanField(default=False)
 	single_branch = models.CharField(max_length=100,choices=SINGLE_DEGREE_BRANCH_CHOICES)
 	dual_branch = models.CharField(max_length=100,choices=DUAL_DEGREE_BRANCH_CHOICES,null=True)
-	new_bitsian = models.BooleanField(default=True) # Keep false for incoming batch.
+	new_bitsian = models.BooleanField(null=True,default=True) # Keep None for incoming batch.
+	hostel = models.CharField(max_length=100,choices=HOSTELS,null=False)
+	room_no = models.IntegerField(null=False)
 
 	def __str__(self):
-		return 'Profile for user {}'.format(self.user.username)
+		return 'Profile for user {} with ID: {}'.format(self.user.username,self.bits_id)
 

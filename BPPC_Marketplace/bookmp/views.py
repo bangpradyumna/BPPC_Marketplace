@@ -1,14 +1,17 @@
 from google.oauth2 import id_token as googleIdToken
 from google.auth.transport import requests as google_requests
 
+from django.db import transaction, IntegrityError
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt # For the webapp on inaug day
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 
+import re
+
 from .models import Profile
-from .utils import generate_random_password, get_jwt_with_user
+from .utils import generate_random_password, get_jwt_with_user, HOSTELS, SINGLE_DEGREE_BRANCHES, DUAL_DEGREE_BRANCHES
 
 CURRENT_YEAR=2019
 
@@ -78,7 +81,7 @@ def login(request):
                 message = str(e)
                 payload = {
                     "detail": message,
-                    "diaplay_message": "Something went wrong. Please try again." 
+                    "display_message": "Something went wrong. Please try again." 
                 }
                 response =  Response(payload, status=403)
                 response.delete_cookie('sessionid')
@@ -88,7 +91,7 @@ def login(request):
                 message = "Not a valid Google account."
                 payload = {
                     "detail": message,
-                    "diaplay_message": message 
+                    "display_message": message 
                 }
                 response =  Response(payload, status=403)
                 response.delete_cookie('sessionid')
@@ -104,7 +107,7 @@ def login(request):
                 message = "Not a valid BITSian account."
                 payload = {
                     "detail": message,
-                    "diaplay_message": message 
+                    "display_message": message 
                 }
                 response =  Response(payload, status=403)
                 response.delete_cookie('sessionid')
@@ -161,7 +164,7 @@ def login(request):
             return response
 
     if user.profile.new_bitsian:
-        new_bitsian = True
+        new_bitsian = True # Copying variable for sending api response
         user.profile.new_bitsian = False
         user.profile.save()
     else:
@@ -185,4 +188,113 @@ def login(request):
     return response
 
 
+@csrf_exempt
+@api_view(['POST'])
+def signup(request):
+    try:
+        name = str(request.data["name"]) 
+        first_name = name.split(' ', 1)[0]
+        try: 
+            last_name = name.split(' ', 1)[1]
+        except IndexError:
+            last_name = ''
+        
+        username = str(request.data["username"])
+        password = str(request.data["password"])    
+        email = str(request.data["email"]) 
+        if not re.match(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)", email):
+            message = "Not a valid email."
+            payload = {
+                "detail": message,
+                "display_message": message 
+            }
+            response =  Response(payload, status=400)
+            return response
 
+        phone = int(request.data["phone"])
+        bits_id = str(request.data["bits_id"])
+        hostel = str(request.data["hostel"])
+        if hostel not in HOSTELS:  
+            message = "Not a valid Hostel value."
+            payload = {
+                "detail": message,
+                "display_message": message 
+            }
+            response =  Response(payload, status=400)
+            return response
+        room_no = int(request.data["room_no"])
+        print(request.data["is_dual_degree"])
+        is_dual_degree = bool(request.data["is_dual_degree"])
+        print(is_dual_degree)
+
+        if is_dual_degree:
+            dual_branch = str(request.data["dual_branch"])
+            if dual_branch not in DUAL_DEGREE_BRANCHES:
+                message = "Not a valid Dual Degree Branch code."
+                payload = {
+                    "detail": message,
+                    "display_message": message 
+                }
+                response =  Response(payload, status=400)
+                return response
+            single_branch = None
+        else:
+            single_branch = str(request.data["single_branch"])
+            if single_branch not in SINGLE_DEGREE_BRANCHES:
+                message = "Not a valid Single Degree Branch code."
+                payload = {
+                    "detail": message,
+                    "display_message": message 
+                }
+                response =  Response(payload, status=400)
+                return response
+            dual_branch = None
+
+        with transaction.atomic(): # Use atomic transactions to create User and Profile instances for each registration.
+            user = User.objects.create( # TODO: Catch Exceptions due to this command
+                        username=username,
+                        password=password,
+                        email = email,
+                        first_name = first_name,
+                        last_name = last_name
+                    )
+            user_profile = Profile.objects.create( # TODO: Catch Exceptions due to this command like user profile for this name etc already exist
+                        user = user,
+                        bits_id = bits_id,
+                        year = 1,
+                        is_dual_degree = is_dual_degree,
+                        single_branch = single_branch,
+                        dual_branch = dual_branch,
+                        new_bitsian = None,
+                        hostel = hostel,
+                        room_no = room_no
+                    )
+            message = "Successfully registered the user. Please login to proceed!"
+            payload = {
+                "detail": message,
+                "display_message": message 
+            }
+            response =  Response(payload, status=200)
+            return response
+
+    except KeyError as missing_key:
+            message = "Missing key: %s" % missing_key
+            payload = {
+                "detail": message,
+                "display_message": message 
+            }
+            response =  Response(payload, status=400)
+            return response
+    except IntegrityError as e: # Shows that a particular field already exists.
+            message = "Field specified already exists: %s" % e.__cause__
+            payload = {
+                "detail": message,
+                "display_message": message 
+            }
+            response =  Response(payload, status=400)
+            return response
+
+
+        
+        
+        
