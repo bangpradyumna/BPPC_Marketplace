@@ -73,7 +73,7 @@ class Profile(models.Model):
 	dual_branch = models.CharField(max_length=100,choices=DUAL_DEGREE_BRANCH_CHOICES,null=True)
 	new_bitsian = models.BooleanField(null=True,default=True) # Keep None for incoming batch.
 	hostel = models.CharField(max_length=100,choices=HOSTELS,null=False)
-	room_no = models.IntegerField(null=False)
+	room_no = models.IntegerField(null=True)
 
 	def __str__(self):
 		return 'Profile for user {} with ID: {}'.format(self.user.username,self.bits_id)
