@@ -13,7 +13,7 @@ import re
 from .models import Profile
 from .utils import generate_random_password, get_jwt_with_user, HOSTELS, SINGLE_DEGREE_BRANCHES, DUAL_DEGREE_BRANCHES
 
-CURRENT_YEAR=2019
+CURRENT_YEAR = 2019
 
 @csrf_exempt
 @api_view(['POST'])
@@ -296,13 +296,15 @@ def signup(request):
             dual_branch = None
 
         with transaction.atomic(): # Use atomic transactions to create User and Profile instances for each registration.
-            user = User.objects.create( # TODO: Catch Exceptions due to this command
-                        username=username,
-                        password=password,
-                        email = email,
-                        first_name = first_name,
-                        last_name = last_name
+            user = User.objects.create_user( # TODO: Catch Exceptions due to this command
+                        username,
+                        email,
+                        password
                     )
+            user.first_name = first_name
+            user.last_name = last_name
+            user.save()
+            
             user_profile = Profile.objects.create( # TODO: Catch Exceptions due to this command like user profile for this name etc already exist
                         user = user,
                         gender = gender,
