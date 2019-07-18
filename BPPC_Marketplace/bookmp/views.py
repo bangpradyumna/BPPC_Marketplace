@@ -142,7 +142,7 @@ def login(request):
                 
                 # Extracting year from email, would have to be updated yearly.
                 # Or we can just ask the user for his year.
-                profile.year = CURRENT_YEAR - int(email[1:4]) + 1 # CURRENT_YEAR variable must be be set on the top of this file. 
+                profile.year = CURRENT_YEAR - int(email[1:5]) + 1 # CURRENT_YEAR variable must be be set on the top of this file. 
                 profile.save()
 
             try:
@@ -150,7 +150,7 @@ def login(request):
             except:
                 profile = Profile()
                 profile.user = user
-                profile.year = CURRENT_YEAR - int(email[1:4]) + 1 # CURRENT_YEAR variable must be be set on the top of this file. 
+                profile.year = CURRENT_YEAR - int(email[1:5]) + 1 # CURRENT_YEAR variable must be be set on the top of this file. 
                 profile.save()
 
         except KeyError as missing_key:
@@ -205,35 +205,67 @@ def signup(request):
         email = str(request.data["email"]) 
         if not re.match(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)", email):
             message = "Not a valid email."
+            detail_message = "Email doesn't comply with regex."
             payload = {
-                "detail": message,
+                "detail": detail_message,
                 "display_message": message 
             }
             response =  Response(payload, status=400)
             return response
 
         phone = int(request.data["phone"])
-        bits_id = str(request.data["bits_id"])
+        bits_id = str(request.data["bits_id"]) 
+        if int(bits_id[0:4])!=2019:
+            message = "Your BITS ID can start only with '2019'"
+            detail_message = "The bits_id started with %d instead of '2019'" % int(bits_id[0:4])
+            payload = {
+                "detail": detail_message,
+                "display_message": message
+            }
+            response =  Response(payload, status=400)
+            return response
+        possible_duplicate_profiles = Profile.objects.filter(bits_id = bits_id)
+        if possible_duplicate_profiles.exists():
+            message = "This BITS ID already exists"
+            detail_message = "bits_id supplied was already found in the database"
+            payload = {
+                "detail": detail_message ,
+                "display_message": message
+            }
+            response =  Response(payload, status=400)
+            return response
+
+
         hostel = str(request.data["hostel"])
         if hostel not in HOSTELS:  
-            message = "Not a valid Hostel value."
+            message = "Hostel name is not valid."
+            detail_message = "Hostel name supplied wasn't found in the database. Refer API docs for more info."
             payload = {
-                "detail": message,
+                "detail": detail_message,
                 "display_message": message 
             }
             response =  Response(payload, status=400)
             return response
+        
         room_no = int(request.data["room_no"])
-        print(request.data["is_dual_degree"])
         is_dual_degree = bool(request.data["is_dual_degree"])
-        print(is_dual_degree)
-
         if is_dual_degree:
             dual_branch = str(request.data["dual_branch"])
             if dual_branch not in DUAL_DEGREE_BRANCHES:
                 message = "Not a valid Dual Degree Branch code."
+                detail_message = "Dual Degree Branch supplied wasn't found in the database. Refer API docs for more info."
                 payload = {
-                    "detail": message,
+                    "detail": detail_message,
+                    "display_message": message 
+                }
+                response =  Response(payload, status=400)
+                return response
+
+            if dual_branch != bits_id[4:6]:
+                message = "Entered branch doesn't match with the ID."
+                detail_message = "Dual Degree Branch supplied was different from the one parsed using BITS ID."
+                payload = {
+                    "detail": detail_message,
                     "display_message": message 
                 }
                 response =  Response(payload, status=400)
@@ -243,12 +275,24 @@ def signup(request):
             single_branch = str(request.data["single_branch"])
             if single_branch not in SINGLE_DEGREE_BRANCHES:
                 message = "Not a valid Single Degree Branch code."
+                detail_message = "Single Degree Branch supplied wasn't found in the database. Refer API docs for more info."
                 payload = {
-                    "detail": message,
+                    "detail": detail_message,
                     "display_message": message 
                 }
                 response =  Response(payload, status=400)
                 return response
+            
+            if single_branch != bits_id[4:6]:
+                message = "Entered branch doesn't match with the ID."
+                detail_message = "Single Degree Branch supplied was different from the one parsed using BITS ID."
+                payload = {
+                    "detail": detail_message,
+                    "display_message": message 
+                }
+                response =  Response(payload, status=400)
+                return response
+
             dual_branch = None
 
         with transaction.atomic(): # Use atomic transactions to create User and Profile instances for each registration.
@@ -272,8 +316,9 @@ def signup(request):
                         room_no = room_no
                     )
             message = "Successfully registered the user. Please login to proceed!"
+            detail_message = "SignUp was completed successfully!"
             payload = {
-                "detail": message,
+                "detail": detail_message,
                 "display_message": message 
             }
             response =  Response(payload, status=200)
@@ -281,14 +326,16 @@ def signup(request):
 
     except KeyError as missing_key:
             message = "Missing key: %s" % missing_key
+            detail_message = "The key: %s is missing in the request. Refer API docs for more info." % missing_key
             payload = {
-                "detail": message,
+                "detail": detail_message,
                 "display_message": message 
             }
             response =  Response(payload, status=400)
             return response
     except IntegrityError as e: # Shows that a particular field already exists.
             message = "Field specified already exists: %s" % e.__cause__
+            detail_message = "%s: This means that one of the fields that you supplied already exists in a database. Refer API docs for more info." % e.__cause__
             payload = {
                 "detail": message,
                 "display_message": message 

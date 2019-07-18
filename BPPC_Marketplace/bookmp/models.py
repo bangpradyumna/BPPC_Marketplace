@@ -2,12 +2,12 @@ from django.db import models
 from django.contrib.auth.models import User
 
 class Profile(models.Model):
-	YEAR_CHOICES = (
-		('1','1st Year'),
-		('2','2nd Year'),
-		('3','3rd Year'),
-		('4','4th Year'),
-		('5','5th Year'),
+	YEAR_CHOICES = ( 
+		(1,'1st Year'),
+		(2,'2nd Year'),
+		(3,'3rd Year'),
+		(4,'4th Year'),
+		(5,'5th Year'),
 	)
 	
 	SINGLE_DEGREE_BRANCH_CHOICES = (
@@ -65,8 +65,8 @@ class Profile(models.Model):
 	)
 
 	user = models.OneToOneField(User,on_delete=models.CASCADE,related_name='profile')
-	gender = models.CharField(max_length=6,null = False)
-	bits_id = models.CharField(max_length=13,null=False,unique=True)
+	gender = models.CharField(max_length=6,null=False)
+	bits_id = models.CharField(max_length=13,null=False) #Removed the unique condition.
 	year = models.IntegerField(choices=YEAR_CHOICES)
 	is_dual_degree = models.BooleanField(default=False)
 	single_branch = models.CharField(max_length=100,choices=SINGLE_DEGREE_BRANCH_CHOICES)
