@@ -11,7 +11,13 @@ from rest_framework.decorators import api_view
 import re
 
 from .models import Profile
-from .utils import generate_random_password, get_jwt_with_user, HOSTELS, SINGLE_DEGREE_BRANCHES, DUAL_DEGREE_BRANCHES
+from .utils import (
+    generate_random_password,
+    get_jwt_with_user,
+    HOSTELS,
+    SINGLE_DEGREE_BRANCHES,
+    DUAL_DEGREE_BRANCHES,
+)
 
 CURRENT_YEAR = 2019
 

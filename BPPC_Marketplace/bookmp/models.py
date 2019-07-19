@@ -78,3 +78,69 @@ class Profile(models.Model):
 	def __str__(self):
 		return 'Profile for user {} with ID: {}'.format(self.user.username,self.bits_id)
 
+
+class Seller(models.Model):
+	profile = models.OneToOneField(Profile, on_delete=models.CASCADE, related_name='seller')
+	is_listed = models.BooleanField(default=True) # To add or remove seller from the sellers list.
+	details = models.CharField(max_length=200)
+	description = models.TextField()
+	
+	# Tags stored in a single string, separated by '~'.
+	tags = models.CharField(max_length=100)
+
+	def __str__(self):
+		return 'Profile for user {} with ID: {}'.format(self.profile.user.username, self.profile.bits_id)
+
+
+class Image(models.Model):
+	seller = models.ForeignKey(Seller, on_delete=models.CASCADE, related_name='images')
+	img = models.ImageField(upload_to='book_images', blank=True, null=True)
+
+
+class Course(models.Model):
+	
+	YEAR_CHOICES = ( 
+		(1,'1st Year'),
+		(2,'2nd Year'),
+		(3,'3rd Year'),
+		(4,'4th Year'),
+		(5,'5th Year'),
+	)
+
+	BRANCH_CHOICES = (
+		('A1','B.E. Chemical'),
+		('A2','B.E. Civil'),
+		('A7','B.E. Computer Science'),
+		('A3','B.E. Electrical & Electronics'),
+		('A8','B.E. Electronics & Instrumentation'),
+		('A4','B.E. Mechanical'),
+		('AB','B.E. Manufacturing'),
+		('A5','B.Pharm.'),
+		('B1','M.Sc. Biological Sciences'),
+		('B2','M.Sc. Chemistry'),
+		('B3','M.Sc. Economics'),
+		('B4','M.Sc. Mathematics'),
+		('B5','M.Sc. Physics'),
+	)
+	
+	name = models.CharField(max_length=100)
+	code = models.CharField(max_length=15)
+	year = models.IntegerField(choices=YEAR_CHOICES)
+	branch = models.CharField(max_length=100, choices=BRANCH_CHOICES, blank=True)
+
+	def __str__(self):
+		return self.code + ' : ' + self.name
+
+
+class BookClass(models.Model):
+	name = models.CharField(max_length=150)
+	course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='books')
+	publisher = models.CharField(max_length=100)
+	
+	def __str__(self):
+		return self.course.code + ' : ' + self.name
+
+
+class BookInstance(models.Model):
+	book_class = models.ForeignKey(BookClass, on_delete=models.CASCADE, related_name='instances')
+	seller = models.ForeignKey(Seller, on_delete=models.CASCADE, related_name='book_instances')
