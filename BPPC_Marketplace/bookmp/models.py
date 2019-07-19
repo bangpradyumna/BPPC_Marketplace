@@ -76,7 +76,7 @@ class Profile(models.Model):
 	room_no = models.IntegerField(null=True)
 
 	def __str__(self):
-		return 'Profile for user {} with ID: {}'.format(self.user.username,self.bits_id)
+		return 'Profile for user {} with ID: {}'.format(xself.user.username,self.bits_id)
 
 
 class Seller(models.Model):
@@ -84,6 +84,7 @@ class Seller(models.Model):
 	is_listed = models.BooleanField(default=True) # To add or remove seller from the sellers list.
 	details = models.CharField(max_length=200)
 	description = models.TextField()
+	price = models.IntegerField()
 	
 	# Tags stored in a single string, separated by '~'.
 	tags = models.CharField(max_length=100)
