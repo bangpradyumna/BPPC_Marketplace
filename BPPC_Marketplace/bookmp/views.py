@@ -5,12 +5,21 @@ from django.db import transaction, IntegrityError
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt # For the webapp on inaug day
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
 
 import re
 
-from .models import Profile
+from .models import (
+    Profile,
+    Seller,
+    Image,
+    Course,
+    BookClass,
+    BookInstance,
+)
+
 from .utils import (
     generate_random_password,
     get_jwt_with_user,
@@ -345,13 +354,95 @@ def signup(request):
             message = "Field specified already exists: %s" % e.__cause__
             detail_message = "%s: This means that one of the fields that you supplied already exists in a database. Refer API docs for more info." % e.__cause__
             payload = {
-                "detail": message,
+                "detail": detail_message,
                 "display_message": message 
             }
             response =  Response(payload, status=400)
             return response
 
+@transaction.atomic
+@csrf_exempt
+@api_view(['POST', 'GET'])
+@permission_classes((IsAuthenticated,))
+def sell(request):
+    
+    if request.method == 'POST':
+        user = request.user
+        
+        try:
+            profile = user.profile
+        except User.profile.RelatedObjectDoesNotExist:
+            message = "Profile does not exist."
+            detail_message = "Profile object for this user does not exist."
+            payload = {
+                "detail": detail_message,
+                "display_message": message 
+            }
+            response =  Response(payload, status=400)
+            return response
 
         
+        seller, created = Seller.objects.get_or_create(profile=profile)
         
+        if created:
+            seller.profile = profile
         
+        try:
+            seller.details = request.data['details']
+            seller.description = request.data['description']
+
+            for tag in request.data['tags']:
+                try:
+                    tags = tags + '~' + str(tag)
+                except:
+                    tags = str(tag)
+
+            seller.tags = tags # A single string of tags, separated by '~'.       
+            seller.save()
+
+            for Id in request.data['book_ids']:
+                try:
+                    book_class = BookClass.objects.get(id=int(Id))
+                except BookClass.DoesNotExist:
+                    message = "Not a valid book."
+                    detail_message = "BookClass with id " + Id + " not found in database."
+                    payload = {
+                        "detail": detail_message,
+                        "display_message": message 
+                    }
+                    response =  Response(payload, status=400)
+                    return response
+
+                new_book_instance = BookInstance()
+                new_book_instance.book_class = book_class
+                new_book_instance.seller = seller
+                new_book_instance.save()
+
+            message = "Submitted successfully!"
+            detail_message = "Success."
+            payload = {
+                "detail": detail_message,
+                "display_message": message 
+            }
+            response =  Response(payload, status=200)
+            return response
+
+        except KeyError as missing_key:
+                message = "Missing key: %s" % missing_key
+                detail_message = "The key: %s is missing in the request. Refer API docs for more info." % missing_key
+                payload = {
+                    "detail": detail_message,
+                    "display_message": message 
+                }
+                response =  Response(payload, status=400)
+                return response
+        
+        except IntegrityError as e: # Shows that a particular field already exists.
+                message = "Field specified already exists: %s" % e.__cause__
+                detail_message = "%s: This means that one of the fields that you supplied already exists in a database. Refer API docs for more info." % e.__cause__
+                payload = {
+                    "detail": detail_message,
+                    "display_message": message 
+                }
+                response =  Response(payload, status=400)
+                return response
