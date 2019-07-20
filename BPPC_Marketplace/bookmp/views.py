@@ -365,22 +365,21 @@ def signup(request):
 @api_view(['POST', 'GET'])
 @permission_classes((IsAuthenticated,))
 def sell(request):
-    
-    if request.method == 'POST':
-        user = request.user
         
-        try:
-            profile = user.profile
-        except User.profile.RelatedObjectDoesNotExist:
-            message = "Profile does not exist."
-            detail_message = "Profile object for this user does not exist."
-            payload = {
-                "detail": detail_message,
-                "display_message": message 
-            }
-            response =  Response(payload, status=400)
-            return response
+    user = request.user
+    try:
+        profile = user.profile
+    except User.profile.RelatedObjectDoesNotExist:
+        message = "Profile does not exist."
+        detail_message = "Profile object for this user does not exist."
+        payload = {
+            "detail": detail_message,
+            "display_message": message 
+        }
+        response =  Response(payload, status=400)
+        return response
 
+    if request.method == 'POST':
         
         seller, created = Seller.objects.get_or_create(profile=profile)
         
@@ -412,11 +411,14 @@ def sell(request):
                     }
                     response =  Response(payload, status=400)
                     return response
-
-                new_book_instance = BookInstance()
-                new_book_instance.book_class = book_class
-                new_book_instance.seller = seller
-                new_book_instance.save()
+                
+                try:
+                    BookInstance.objects.get(seller=seller, book_class=book_class)
+                except:
+                    new_book_instance = BookInstance()
+                    new_book_instance.book_class = book_class
+                    new_book_instance.seller = seller
+                    new_book_instance.save()
 
             message = "Submitted successfully!"
             detail_message = "Success."
@@ -446,3 +448,70 @@ def sell(request):
                 }
                 response =  Response(payload, status=400)
                 return response
+
+    elif request.method == 'GET':
+
+        if profile.year == 1:
+            message = "2019 batch is not allowed to access the sell page."
+            detail_message = "The 'year' field for this user is set to 1."
+            payload = {
+                "detail": detail_message,
+                "display_message": message 
+            }
+            response =  Response(payload, status=400)
+            return response
+
+        try:
+            seller = profile.seller
+            payload = {
+                "details":seller.details,
+                "description":seller.description,
+                "tags":seller.tags,
+            }
+        except:
+            payload = {
+                "details":"",
+                "description":"",
+                "tags":"",      
+            }
+
+        try:
+            branches = [profile.single_branch]
+            if profile.is_dual_degree:
+                branches.append(profile.dual_branch)
+        except:
+            message = "Invalid branch details"
+            detail_message = "This user has invalid branch details."
+            payload = {
+                "detail": detail_message,
+                "display_message": message 
+            }
+            response =  Response(payload, status=400)
+            return response
+        
+            courses = Course.objects.filter(year=profile.year, branch__in=branches)
+            payload['courses'] = {}
+
+            try:
+                course_count = 0
+                                
+                for course in courses:
+                    payload['courses']['course'+str(course_count)] = {}
+                    book_count = 0    
+                    books = course.books.all()
+
+                    for book in books:
+                        payload['courses']['course'+str(course_count)]['book'+str(book_count)] = {}
+                        payload['courses']['course'+str(course_count)]['book'+str(book_count)]['name'] = book.name
+                        payload['courses']['course'+str(course_count)]['book'+str(book_count)]['id'] = book.id
+
+                        book_count += 1
+                    
+                    payload['courses']['course'+str(course_count)]['book_count'] = str(book_count)
+                    course_count += 1
+                    
+                payload['course_count'] = str(course_count)
+                        
+
+
+
