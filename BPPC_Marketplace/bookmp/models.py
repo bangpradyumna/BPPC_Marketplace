@@ -76,7 +76,7 @@ class Profile(models.Model):
 	room_no = models.IntegerField(null=True)
 
 	def __str__(self):
-		return 'Profile for user {} with ID: {}'.format(xself.user.username,self.bits_id)
+		return 'Profile for user {} with ID: {}'.format(self.user.username,self.bits_id)
 
 
 class Seller(models.Model):
