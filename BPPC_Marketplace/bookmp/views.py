@@ -489,29 +489,30 @@ def sell(request):
             response =  Response(payload, status=400)
             return response
         
-            courses = Course.objects.filter(year=profile.year, branch__in=branches)
-            payload['courses'] = {}
+        courses = Course.objects.filter(year=profile.year, branch__in=branches)
+        payload['courses'] = {}
 
-            try:
-                course_count = 0
-                                
-                for course in courses:
-                    payload['courses']['course'+str(course_count)] = {}
-                    book_count = 0    
-                    books = course.books.all()
-
-                    for book in books:
-                        payload['courses']['course'+str(course_count)]['book'+str(book_count)] = {}
-                        payload['courses']['course'+str(course_count)]['book'+str(book_count)]['name'] = book.name
-                        payload['courses']['course'+str(course_count)]['book'+str(book_count)]['id'] = book.id
-
-                        book_count += 1
-                    
-                    payload['courses']['course'+str(course_count)]['book_count'] = str(book_count)
-                    course_count += 1
-                    
-                payload['course_count'] = str(course_count)
+        course_count = 0
                         
+        for course in courses:
+            payload['courses']['course'+str(course_count)] = {}
+            book_count = 0    
+            books = course.books.all()
 
+            for book in books:
+                payload['courses']['course'+str(course_count)]['book'+str(book_count)] = {}
+                payload['courses']['course'+str(course_count)]['book'+str(book_count)]['name'] = book.name
+                payload['courses']['course'+str(course_count)]['book'+str(book_count)]['id'] = book.id
+
+                book_count += 1
+            
+            payload['courses']['course'+str(course_count)]['book_count'] = str(book_count)
+            course_count += 1
+
+        payload['course_count'] = str(course_count)
+    
+        response =  Response(payload, status=200)
+        return response
+    
 
 
