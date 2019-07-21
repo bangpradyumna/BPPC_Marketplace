@@ -360,6 +360,7 @@ def signup(request):
             response =  Response(payload, status=400)
             return response
 
+
 @transaction.atomic
 @csrf_exempt
 @api_view(['POST', 'GET'])
@@ -419,7 +420,24 @@ def sell(request):
                     new_book_instance.book_class = book_class
                     new_book_instance.seller = seller
                     new_book_instance.save()
+    
+                    with transaction.atomic(): # Delete old images to avoid duplicates.
+                        
+                        images = Image.objects.filter(seller=seller)
+                        for image in images:
+                            image.delete()
+                            # The actual image file is deleted using signals.
+                            # SEE: models.auto_delete_file_on_delete()
 
+                        for filename, file in request.FILES.items():
+                            # Adding the new images.
+                            image_object = Image()
+                            image_object.seller = seller
+                            img = request.FILES[filename]
+                            image_object.img = img
+                            image_object.save()
+                            
+                    
             message = "Submitted successfully!"
             detail_message = "Success."
             payload = {
@@ -466,13 +484,25 @@ def sell(request):
             payload = {
                 "details":seller.details,
                 "description":seller.description,
-                "tags":seller.tags,
             }
+            
+            # Adding the list of tags.
+            payload['tags'] = seller.tags.split('~')
+
+            # Adding the image urls.
+            images = Image.objects.get(seller=seller)
+            payload['images'] = []
+            for image in images:
+                img_dict = {}
+                img_dict['url'] = image.img.url
+                payload['images'].append(img_dict)
+
         except:
             payload = {
                 "details":"",
                 "description":"",
-                "tags":"",      
+                "tags":"",
+                "images":[]  
             }
 
         try:
@@ -489,27 +519,34 @@ def sell(request):
             response =  Response(payload, status=400)
             return response
         
-        courses = Course.objects.filter(year=profile.year, branch__in=branches)
-        payload['courses'] = {}
-
-        course_count = 0
+        if profile.year == 2:
+            courses = Course.objects.filter(year=profile.year-1)
+        elif profile.year > 2:    
+            courses = Course.objects.filter(year=profile.year-1, branch__in=branches)
+        
+        payload['books'] = [] # A list of books, inside every course_dict.
                         
         for course in courses:
-            payload['courses']['course'+str(course_count)] = {}
-            book_count = 0    
+
             books = course.books.all()
-
-            for book in books:
-                payload['courses']['course'+str(course_count)]['book'+str(book_count)] = {}
-                payload['courses']['course'+str(course_count)]['book'+str(book_count)]['name'] = book.name
-                payload['courses']['course'+str(course_count)]['book'+str(book_count)]['id'] = book.id
-
-                book_count += 1
             
-            payload['courses']['course'+str(course_count)]['book_count'] = str(book_count)
-            course_count += 1
+            for book in books:
+                book_dict = {} # Similar to courses, each book is a dict.
+                book_dict['name'] = book.name
+                book_dict['id'] = book.id
+                book_dict['category'] = course.name
+                payload['books'].append(book_dict)
 
-        payload['course_count'] = str(course_count)
+        try:
+            selected_books = BookInstance.objects.filter(seller=seller)
+            payload['selected_books'] = []
+
+            for book in selected_books:
+                book_dict = {}
+                book_dict['id'] = str(book.book_class.id)
+                payload['selected_books'].append(book_dict)
+        except:
+            payload['selected_books'] = []
     
         response =  Response(payload, status=200)
         return response

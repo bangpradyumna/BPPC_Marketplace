@@ -1,3 +1,6 @@
+import os
+
+from django.dispatch import receiver
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -76,7 +79,7 @@ class Profile(models.Model):
 	room_no = models.IntegerField(null=True)
 
 	def __str__(self):
-		return 'Profile for user {} with ID: {}'.format(self.user.username,self.bits_id)
+		return 'Profile for user {} with ID: {}'.format(self.user.username, self.bits_id)
 
 
 class Seller(models.Model):
@@ -145,3 +148,14 @@ class BookClass(models.Model):
 class BookInstance(models.Model):
 	book_class = models.ForeignKey(BookClass, on_delete=models.CASCADE, related_name='instances')
 	seller = models.ForeignKey(Seller, on_delete=models.CASCADE, related_name='book_instances')
+
+
+@receiver(models.signals.post_delete, sender=Image)
+def auto_delete_file_on_delete(sender, instance, **kwargs):
+    """
+    Deletes file from system
+    when corresponding `Image` object is deleted.
+    """
+    if instance.file:
+        if os.path.isfile(instance.file.path):
+            os.remove(instance.file.path)
