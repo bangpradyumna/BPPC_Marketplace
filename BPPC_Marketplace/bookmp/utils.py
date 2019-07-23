@@ -66,8 +66,6 @@ BOYS_HOSTEL = {
 	"MV-C": "Malviya-C Bhawan"	
 }
 
-}
-
 SINGLE_DEGREE_BRANCHES = {
 	"A1":"B.E. Chemical",
 	"A2":"B.E. Civil",
