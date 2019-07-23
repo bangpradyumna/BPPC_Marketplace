@@ -26,6 +26,8 @@ from .utils import (
     HOSTELS,
     SINGLE_DEGREE_BRANCHES,
     DUAL_DEGREE_BRANCHES,
+    BOYS_HOSTEL,
+    GIRLS_HOSTEL,
 )
 
 CURRENT_YEAR = 2019
@@ -215,6 +217,16 @@ def signup(request):
             last_name = ''
         
         gender = str(request.data["gender"])
+        if gender not in ['M','F']:
+            message = "Not a valid gender ID"
+            detail_message = "Gender entered is invalid."
+            payload = {
+                "detail": detail_message,
+                "display_message": message 
+            }
+            response =  Response(payload, status=400)
+            return response
+
         username = str(request.data["username"])
         password = str(request.data["password"])    
         email = str(request.data["email"]) 
@@ -273,6 +285,27 @@ def signup(request):
             response =  Response(payload, status=400)
             return response
         
+        if gender == 'M':
+            if hostel in GIRLS_HOSTEL:
+                message = "We wish boys were allowed in Meera but they aren't :("
+                detail_message = "Hostel selected is not available for the entered gender."
+                payload = {
+                    "detail": detail_message,
+                    "display_message": message 
+                }
+                response =  Response(payload, status=400)
+                return response
+        else :
+            if hostel in BOYS_HOSTEL:
+                message = "We wish girls were allowed in Boys Hostels but they aren't :("
+                detail_message = "Hostel selected is not available for the entered gender."
+                payload = {
+                    "detail": detail_message,
+                    "display_message": message 
+                }
+                response =  Response(payload, status=400)
+                return response
+
         room_no = int(request.data["room_no"])
         is_dual_degree = bool(request.data["is_dual_degree"])
         if is_dual_degree:
@@ -318,7 +351,6 @@ def signup(request):
                 }
                 response =  Response(payload, status=400)
                 return response
-
             dual_branch = None
 
         with transaction.atomic(): # Use atomic transactions to create User and Profile instances for each registration.
