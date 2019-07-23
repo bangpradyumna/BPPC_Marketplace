@@ -239,6 +239,17 @@ def signup(request):
             }
             response =  Response(payload, status=400)
             return response
+        
+        if not re.match(r'^2019[AB]\dPS\d\d\d\d[PT]$', bits_id):
+            message = "Not a valid ID"
+            detail_message = "ID doesn't comply with regex."
+            payload = {
+                "detail": detail_message,
+                "display_message": message 
+            }
+            response =  Response(payload, status=400)
+            return response
+
         possible_duplicate_profiles = Profile.objects.filter(bits_id = bits_id)
         if possible_duplicate_profiles.exists():
             message = "This BITS ID already exists"
