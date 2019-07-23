@@ -433,6 +433,7 @@ def sell(request):
         try:
             seller.details = request.data['details']
             seller.description = request.data['description']
+            seller.price = int(request.data['price'])
 
             for tag in request.data['tags']:
                 try:
@@ -527,6 +528,7 @@ def sell(request):
             payload = {
                 "details":seller.details,
                 "description":seller.description,
+                "price":str(seller.price),
             }
             
             # Adding the list of tags.
@@ -545,6 +547,7 @@ def sell(request):
                 "details":"",
                 "description":"",
                 "tags":"",
+                "price":"",
                 "images":[]  
             }
 
