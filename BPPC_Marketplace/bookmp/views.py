@@ -193,11 +193,8 @@ def login(request):
     "name": user.first_name + ' ' + user.last_name,
     "email": user.email,
     "new_bitsian": new_bitsian,
+    "bitsian_id": user.profile.bits_id,
     }
-    if auth_mode == 2:
-        payload["bitsian_id"] = profile.bits_id
-    else:
-        payload["bitsian_id"] = ""
 
 
     response =  Response(payload, status=200)
