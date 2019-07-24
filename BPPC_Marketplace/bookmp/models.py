@@ -77,6 +77,8 @@ class Profile(models.Model):
 	new_bitsian = models.BooleanField(null=True,default=True) # Keep None for incoming batch.
 	hostel = models.CharField(max_length=100,choices=HOSTELS,null=False)
 	room_no = models.IntegerField(null=True)
+	unique_code = models.CharField(default="lolmao", max_length=10) # For email confirmation.
+	is_email_confirmed = models.BooleanField(default=False)
 
 	def __str__(self):
 		return 'Profile for user {} with ID: {}'.format(self.user.username, self.bits_id)

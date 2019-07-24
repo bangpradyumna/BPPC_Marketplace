@@ -3,11 +3,15 @@ from google.auth.transport import requests as google_requests
 
 from django.db import transaction, IntegrityError
 from django.contrib.auth import authenticate
+from django.shortcuts import HttpResponse
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt # For the webapp on inaug day
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+
+from BPPC_Marketplace import keyconfig
+
 
 import re
 
@@ -29,6 +33,8 @@ from .utils import (
     BOYS_HOSTEL,
     GIRLS_HOSTEL,
 )
+
+from .email import send_confirmation_mail
 
 CURRENT_YEAR = 2019
 
@@ -305,7 +311,7 @@ def signup(request):
 
         room_no = int(request.data["room_no"])
         is_dual_degree = bool(request.data["is_dual_degree"])
-        if is_dual_degree:
+        if is_dual_degree and False:
             dual_branch = str(request.data["dual_branch"])
             if dual_branch not in DUAL_DEGREE_BRANCHES:
                 message = "Not a valid Dual Degree Branch code."
@@ -351,6 +357,7 @@ def signup(request):
             dual_branch = None
 
         with transaction.atomic(): # Use atomic transactions to create User and Profile instances for each registration.
+
             user = User.objects.create_user( # TODO: Catch Exceptions due to this command
                         username,
                         email,
@@ -359,7 +366,7 @@ def signup(request):
             user.first_name = first_name
             user.last_name = last_name
             user.save()
-            
+            unique_code = generate_random_password()  # Should change the name of this function I think.
             user_profile = Profile.objects.create( # TODO: Catch Exceptions due to this command like user profile for this name etc already exist
                         user = user,
                         gender = gender,
@@ -370,10 +377,20 @@ def signup(request):
                         dual_branch = dual_branch,
                         new_bitsian = None,
                         hostel = hostel,
-                        room_no = room_no
+                        room_no = room_no,
+                        is_email_confirmed=False,
+                        unique_code = unique_code
                     )
-            message = "Successfully registered the user. Please login to proceed!"
-            detail_message = "SignUp was completed successfully!"
+            try:
+                confirmation_url = keyconfig.SERVER_ADDRESS + 'api/auth/confirm_email/' + str(unique_code)  # currently, SERVER_ADDRESS = localhost:8080
+                send_confirmation_mail(email, confirmation_url)
+                message = "Successfully registered the user. Please login to proceed!"
+                detail_message = "SignUp was completed successfully!"
+            except:
+                message = "Error! Could not register the user"
+                detail_message = "What the fuck, sendgrid?"
+                user_profile.delete()  # Rolling back changes. Could've sent the email before these changes were
+                user.delete()          # made, but then I can't unsend the email if the object creation fails.
             payload = {
                 "detail": detail_message,
                 "display_message": message 
@@ -595,4 +612,9 @@ def sell(request):
         return response
     
 
-
+def confirm_email(request, unique_code):
+    target_user = Profile.objects.get(unique_code=unique_code)  
+    target_user.is_email_confirmed = True
+    target_user.unique_code = "confirm"   # Just reducing the chances of a unique_code collision even more
+    target_user.save()
+    return HttpResponse("Email verification successful") # Replace with a nice template or something later.
