@@ -311,7 +311,7 @@ def signup(request):
 
         room_no = int(request.data["room_no"])
         is_dual_degree = bool(request.data["is_dual_degree"])
-        if is_dual_degree and False:
+        if is_dual_degree:
             dual_branch = str(request.data["dual_branch"])
             if dual_branch not in DUAL_DEGREE_BRANCHES:
                 message = "Not a valid Dual Degree Branch code."
