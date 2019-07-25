@@ -595,4 +595,71 @@ def sell(request):
         return response
     
 
+@csrf_exempt
+@api_view(['GET'])
+@permission_classes((IsAuthenticated,))
+def SellerList(request):
+    
+    user = request.user
+    
+    try:
+        profile = user.profile
+        year = profile.year
+        single_branch = profile.single_branch
+        dual_branch = profile.dual_branch
+
+    except User.profile.RelatedObjectDoesNotExist:
+        message = "Profile does not exist."
+        detail_message = "Profile object for this user does not exist."
+        payload = {
+            "detail": detail_message,
+            "display_message": message 
+        }
+        response =  Response(payload, status=400)
+        return response
+
+    # No check for is_dual_degree as the values will match nonetheless (None).
+    seniors_same_branch = Seller.objects.filter(profile__year=year+1,
+                                                profile__single_branch=single_branch,
+                                                profile__dual_branch=dual_branch,
+                                                is_listed=True)
+    
+    # Number of books in the seller's year and branch(es).
+    book_count_total = BookClass.objects.filter(course__branch__in=[single_branch, dual_branch],
+                                                course__year=year).count()
+    
+    payload = {}
+    payload['sellers'] = []
+    for seller in seniors_same_branch:
+        seller_dict = {}
+        seller_dict['id'] = seller.id
+        seller_dict['name'] = seller.profile.user.name
+        seller_dict['tags'] = seller.tags.split('~')
+        seller_dict['price'] = seller.price
+
+        book_count = BookInstance.objects.filter(seller=seller).count()
+        seller_dict['no_of_books'] = str(book_count) + '/' + str(book_count_total)
+        
+        payload['sellers'].append(seller_dict)
+
+    # Add seniors of different branch if the buyer is a 1st yearite.
+    if profile.year == 1:
+        seniors_different_branch = Seller.objects.filter(is_listed=True,
+                                                         profile__year=year+1).exclude(profile__single_branch=single_branch,
+                                                                                       profile__dual_branch=dual_branch)
+        for seller in seniors_different_branch:
+            seller_dict = {}
+            seller_dict['id'] = seller.id
+            seller_dict['name'] = seller.profile.user.name
+            seller_dict['tags'] = seller.tags.split('~')
+            seller_dict['price'] = seller.price
+
+            book_count = BookInstance.objects.filter(seller=seller).count()
+            seller_dict['no_of_books'] = str(book_count) + '/' + str(book_count_total)
+            
+            payload['sellers'].append(seller_dict)
+
+    response = Response(payload, status=200)
+    return response
+    
 
