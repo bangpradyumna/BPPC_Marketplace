@@ -669,3 +669,49 @@ def SellerList(request):
 
     response = Response(payload, status=200)
     return response
+
+
+@csrf_exempt
+@api_view(['GET'])
+def SellerDetails(request, seller_id):
+    try:
+        seller = Seller.objects.get(id=seller_id)
+    except:
+        message = "Invalid Seller ID."
+        detail_message = "Seller with this ID does not exist."
+        payload = {
+            "detail": detail_message,
+            "display_message": message 
+        }
+        response =  Response(payload, status=400)
+        return response
+
+    if not seller.is_listed:
+        message = "This seller is currently not available."
+        detail_message = "Seller is currently un-listed."
+        payload = {
+            "detail": detail_message,
+            "display_message": message 
+        }
+        response =  Response(payload, status=400)
+        return response
+
+    books = BookInstance.objects.filter(seller=seller)
+    no_of_books = books.count()
+
+    payload = {
+        "name": seller.profile.user.name,
+        "price": seller.price,
+        "no_of_books": no_of_books,
+    }
+
+    payload['tags'] = seller.tags.split('~')
+
+    payload['books'] = []
+    for book in books:
+        payload['books'].append(book.book_class.name)
+
+    response = Response(payload, status=200)
+    return response
+
+    
