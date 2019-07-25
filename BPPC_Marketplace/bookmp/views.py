@@ -593,7 +593,15 @@ def sell(request):
     
         response =  Response(payload, status=200)
         return response
-    
+
+
+def confirm_email(request, unique_code):
+    target_user = Profile.objects.get(unique_code=unique_code)  
+    target_user.is_email_confirmed = True
+    target_user.unique_code = "confirm"   # Just reducing the chances of a unique_code collision even more
+    target_user.save()
+    return HttpResponse("Email verification successful") # Replace with a nice template or something later.
+
 
 @csrf_exempt
 @api_view(['GET'])
@@ -661,5 +669,3 @@ def SellerList(request):
 
     response = Response(payload, status=200)
     return response
-    
-
