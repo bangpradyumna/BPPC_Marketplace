@@ -11,7 +11,9 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
+import datetime
 from . import keyconfig
+
 
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
@@ -103,20 +105,24 @@ else:
         }
     }
 
-
 # REST Framework settings
 # https://www.django-rest-framework.org/
 # http://getblimp.github.io/django-rest-framework-jwt/
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.AllowAny',
+    ),
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.BasicAuthentication',
-    ),
+    )
 }
+
 
 JWT_AUTH = {
     "JWT_EXPIRATION_DELTA": datetime.timedelta(days=365)

@@ -404,6 +404,7 @@ def signup(request):
 @transaction.atomic
 @csrf_exempt
 @api_view(['POST', 'GET'])
+@permission_classes((IsAuthenticated,))
 def sell(request):
         
     user = request.user
@@ -610,6 +611,7 @@ def confirm_email(request, unique_code):
     return HttpResponse("Email verification successful") # Replace with a nice template or something later.
 
 
+@permission_classes((IsAuthenticated,))
 @csrf_exempt
 @api_view(['GET'])
 def SellerList(request):
@@ -678,7 +680,7 @@ def SellerList(request):
     response.delete_cookie('sessionid')
     return response
 
-
+@permission_classes((IsAuthenticated,))
 @csrf_exempt
 @api_view(['GET'])
 def SellerDetails(request, seller_id):
