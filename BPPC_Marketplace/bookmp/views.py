@@ -708,20 +708,22 @@ def SellerDetails(request, seller_id):
         response.delete_cookie('sessionid')
         return response
 
-    books = BookInstance.objects.filter(seller=seller)
-    no_of_books = books.count()
-
     payload = {
-        "name": seller.profile.user.name,
-        "price": seller.price,
-        "no_of_books": no_of_books,
+        "description": seller.description,
+        "details": seller.details
     }
 
-    payload['tags'] = seller.tags.split('~')
-
+    books = BookInstance.objects.filter(seller=seller)
+    # List of books.
     payload['books'] = []
     for book in books:
         payload['books'].append(book.book_class.name)
+    
+    # Adding the image urls.
+    images = Image.objects.get(seller=seller)
+    payload['images'] = []
+    for image in images:
+        payload['images'].append(image.img.url)
 
     response = Response(payload, status=200)
     response.delete_cookie('sessionid')
