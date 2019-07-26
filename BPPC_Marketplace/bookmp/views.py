@@ -611,9 +611,9 @@ def confirm_email(request, unique_code):
     return HttpResponse("Email verification successful") # Replace with a nice template or something later.
 
 
-@permission_classes((IsAuthenticated,))
 @csrf_exempt
 @api_view(['GET'])
+@permission_classes((IsAuthenticated,))
 def SellerList(request):
     
     user = request.user
