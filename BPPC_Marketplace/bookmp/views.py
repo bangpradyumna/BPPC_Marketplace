@@ -404,7 +404,6 @@ def signup(request):
 @transaction.atomic
 @csrf_exempt
 @api_view(['POST', 'GET'])
-@permission_classes((IsAuthenticated,))
 def sell(request):
         
     user = request.user
@@ -613,7 +612,6 @@ def confirm_email(request, unique_code):
 
 @csrf_exempt
 @api_view(['GET'])
-@permission_classes((IsAuthenticated,))
 def SellerList(request):
     
     user = request.user
