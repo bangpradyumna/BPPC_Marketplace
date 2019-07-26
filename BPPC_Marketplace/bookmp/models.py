@@ -133,6 +133,7 @@ class Course(models.Model):
 	code = models.CharField(max_length=15)
 	year = models.IntegerField(choices=YEAR_CHOICES)
 	branch = models.CharField(max_length=100, choices=BRANCH_CHOICES, blank=True)
+	is_elective = models.BooleanField(default=False)
 
 	def __str__(self):
 		return self.code + ' : ' + self.name
