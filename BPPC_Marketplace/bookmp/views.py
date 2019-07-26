@@ -418,6 +418,7 @@ def sell(request):
             "display_message": message 
         }
         response =  Response(payload, status=400)
+        response.delete_cookie('sessionid')
         return response
 
     if request.method == 'POST':
@@ -452,6 +453,7 @@ def sell(request):
                         "display_message": message 
                     }
                     response =  Response(payload, status=400)
+                    response.delete_cookie('sessionid')
                     return response
                 
                 try:
@@ -486,6 +488,7 @@ def sell(request):
                 "display_message": message 
             }
             response =  Response(payload, status=200)
+            response.delete_cookie('sessionid')
             return response
 
         except KeyError as missing_key:
@@ -496,6 +499,7 @@ def sell(request):
                     "display_message": message 
                 }
                 response =  Response(payload, status=400)
+                response.delete_cookie('sessionid')
                 return response
         
         except IntegrityError as e: # Shows that a particular field already exists.
@@ -506,6 +510,7 @@ def sell(request):
                     "display_message": message 
                 }
                 response =  Response(payload, status=400)
+                response.delete_cookie('sessionid')
                 return response
 
     elif request.method == 'GET':
@@ -518,6 +523,7 @@ def sell(request):
                 "display_message": message 
             }
             response =  Response(payload, status=400)
+            response.delete_cookie('sessionid')
             return response
 
         try:
@@ -560,6 +566,7 @@ def sell(request):
                 "display_message": message 
             }
             response =  Response(payload, status=400)
+            response.delete_cookie('sessionid')
             return response
         
         if profile.year == 2:
@@ -592,6 +599,7 @@ def sell(request):
             payload['selected_books'] = []
     
         response =  Response(payload, status=200)
+        response.delete_cookie('sessionid')
         return response
 
 
@@ -624,6 +632,7 @@ def SellerList(request):
             "display_message": message 
         }
         response =  Response(payload, status=400)
+        response.delete_cookie('sessionid')
         return response
 
     # No check for is_dual_degree as the values will match nonetheless (None).
@@ -668,6 +677,7 @@ def SellerList(request):
             payload['sellers'].append(seller_dict)
 
     response = Response(payload, status=200)
+    response.delete_cookie('sessionid')
     return response
 
 
@@ -684,6 +694,7 @@ def SellerDetails(request, seller_id):
             "display_message": message 
         }
         response =  Response(payload, status=400)
+        response.delete_cookie('sessionid')
         return response
 
     if not seller.is_listed:
@@ -694,6 +705,7 @@ def SellerDetails(request, seller_id):
             "display_message": message 
         }
         response =  Response(payload, status=400)
+        response.delete_cookie('sessionid')
         return response
 
     books = BookInstance.objects.filter(seller=seller)
@@ -712,6 +724,7 @@ def SellerDetails(request, seller_id):
         payload['books'].append(book.book_class.name)
 
     response = Response(payload, status=200)
+    response.delete_cookie('sessionid')
     return response
 
     
