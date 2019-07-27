@@ -874,24 +874,10 @@ def DetailsCollection(request):
             dual_branch = None
 
         with transaction.atomic():
-            
-            user_profile = Profile.objects.create( # TODO: Catch Exceptions due to this command like user profile for this name etc already exist
-                        user = user,
-                        gender = gender,
-                        bits_id = bits_id,
-                        year = 1,
-                        is_dual_degree = is_dual_degree,
-                        single_branch = single_branch,
-                        dual_branch = dual_branch,
-                        new_bitsian = None,
-                        hostel = hostel,
-                        room_no = room_no
-                    )
 
             profile = user.profile
             profile.gender = gender
             profile.bits_id = bits_id
-            profile.year = year_of_study
             profile.is_dual_degree = is_dual_degree
             profile.single_branch = single_branch
             profile.dual_branch = dual_branch
