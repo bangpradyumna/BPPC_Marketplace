@@ -15,6 +15,7 @@ from bookmp.models import BookClass, BookInstance, Course, Image, Profile, Selle
 from bookmp.utils import (BOYS_HOSTEL, DUAL_DEGREE_BRANCHES, GIRLS_HOSTEL, HOSTELS,
                           SINGLE_DEGREE_BRANCHES, generate_random_password,
                           get_jwt_with_user)
+from bookmp.decorators import disable_unconfirmed_email_users
 
 CURRENT_YEAR = 2019
 
@@ -23,6 +24,7 @@ CURRENT_YEAR = 2019
 @csrf_exempt
 @api_view(['POST', 'GET'])
 @permission_classes((IsAuthenticated,))
+@disable_unconfirmed_email_users
 def sell(request):
 
     user = request.user
