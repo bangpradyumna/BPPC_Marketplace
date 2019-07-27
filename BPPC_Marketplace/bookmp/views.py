@@ -650,7 +650,10 @@ def SellerList(request):
     for seller in seniors_same_branch:
         seller_dict = {}
         seller_dict['id'] = seller.id
-        seller_dict['name'] = seller.profile.user.name
+
+        name = seller.profile.user.first_name + ' ' + seller.profile.user.last_name
+        seller_dict['name'] = name
+
         seller_dict['tags'] = seller.tags.split('~')
         seller_dict['price'] = seller.price
 
@@ -667,7 +670,10 @@ def SellerList(request):
         for seller in seniors_different_branch:
             seller_dict = {}
             seller_dict['id'] = seller.id
-            seller_dict['name'] = seller.profile.user.name
+            
+            name = seller.profile.user.first_name + ' ' + seller.profile.user.last_name
+            seller_dict['name'] = name
+
             seller_dict['tags'] = seller.tags.split('~')
             seller_dict['price'] = seller.price
 
