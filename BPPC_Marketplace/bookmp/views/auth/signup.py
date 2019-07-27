@@ -201,7 +201,7 @@ def signup(request):
                 confirmation_url = keyconfig.SERVER_ADDRESS + '/api/auth/confirm_email/' + \
                     str(unique_code)
                 send_confirmation_mail(email, confirmation_url)
-                message = "We've sent a verification link to your email: %s, Please click on it to complete the registration." % email
+                message = "We've sent a verification link to your email: %s, Please click on it to complete the registration. NOTE: Please check your spam folder if you haven't recieved it." % email
                 detail_message = "SignUp was completed successfully, Email verification is pending!"
 
             except:
