@@ -66,7 +66,7 @@ def login(request):
             # Create profile if it doesn't exist.
             try:
                 profile = user.profile
-                if profle.is_email_confirmed == False:
+                if profile.is_email_confirmed == False:
                     # Email not verified, You're not allowed.
                     message = "Email not verified! Please click on confirmation link that was emailed after signup."
                     payload = {
