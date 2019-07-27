@@ -174,12 +174,50 @@ def sell(request):
             }
 
         try:
-            branches = [profile.single_branch]
+            year = profile.year
+            
+            # Three types of courses: 
+            # 1 - Courses for all branches.
+            # 2 - Courses for single branches(B.E.)
+            # 3 - Courses for dual branches(M.Sc.) 
+            
+            course_types = []
+            
+            # Add courses that are for all branches.
+            all_branch_courses = Course.objects.filter(year=year-1, branch='ALL')
+            course_types.append(all_branch_courses)
+
+            # Add courses for dual branches.
             if profile.is_dual_degree:
-                branches.append(profile.dual_branch)
+                dual_courses = Course.objects.filter(year=year-1, branch=profile.dual_branch)
+                course_types.append(dual_courses)
+                
+                # Add single branch courses for dualites.
+                # 'year-2' because dualites have single degree courses a year late.
+                if not profile.single_branch is None:
+                    single_courses = Course.objects.filter(year=year-2, branch=profile.single_branch)
+                    course_types.append(single_courses)
+            
+            # Add courses for non-dualites.
+            else:
+                if not profile.single_branch is None:
+                    single_courses = Course.objects.filter(year=year-1, branch=profile.single_branch)
+                    course_types.append(single_courses)
+                else:
+                    message = "Error: No branch specified."
+                    detail_message = "This niether has a single_branch nor any dual_branch."
+                    payload = {
+                        "detail": detail_message,
+                        "display_message": message
+                    }
+                    response = Response(payload, status=400)
+                    response.delete_cookie('sessionid')
+                    return response
+
+
         except:
-            message = "Invalid branch details"
-            detail_message = "This user has invalid branch details."
+            message = "Error in fetching courses for you."
+            detail_message = "An error occured while fetching courses for this user."
             payload = {
                 "detail": detail_message,
                 "display_message": message
@@ -188,24 +226,20 @@ def sell(request):
             response.delete_cookie('sessionid')
             return response
 
-        if profile.year == 2:
-            courses = Course.objects.filter(year=profile.year-1)
-        elif profile.year > 2:
-            courses = Course.objects.filter(
-                year=profile.year-1, branch__in=branches)
-
         payload['books'] = []  # A list of books, inside every course_dict.
 
-        for course in courses:
+        for course_type in course_types:
+            
+            for course in course_type:
 
-            books = course.books.all()
+                books = course.books.all()
 
-            for book in books:
-                book_dict = {}  # Similar to courses, each book is a dict.
-                book_dict['title'] = book.name
-                book_dict['id'] = book.id
-                book_dict['category'] = course.name
-                payload['books'].append(book_dict)
+                for book in books:
+                    book_dict = {}  # Each book is a dict.
+                    book_dict['title'] = book.name
+                    book_dict['id'] = book.id
+                    book_dict['category'] = course.name
+                    payload['books'].append(book_dict)
 
         try:
             selected_books = BookInstance.objects.filter(seller=seller)
