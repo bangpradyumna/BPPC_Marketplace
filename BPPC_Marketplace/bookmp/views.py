@@ -582,7 +582,7 @@ def sell(request):
             
             for book in books:
                 book_dict = {} # Similar to courses, each book is a dict.
-                book_dict['name'] = book.name
+                book_dict['title'] = book.name
                 book_dict['id'] = book.id
                 book_dict['category'] = course.name
                 payload['books'].append(book_dict)
