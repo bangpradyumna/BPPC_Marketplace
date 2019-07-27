@@ -10,5 +10,6 @@ urlpatterns=[
     path('sell/', views.sell, name='sell'),
     path('SellerList/', views.SellerList, name='SellerList'),
     path('SellerDetails/<int:seller_id>/', views.SellerDetails, name='SellerDetails'),
+    path('DetailsCollection/', views.DetailsCollection, name='DetailsCollection'),
 
 ]    
