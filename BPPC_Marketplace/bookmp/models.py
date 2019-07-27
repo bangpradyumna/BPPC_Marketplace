@@ -73,7 +73,7 @@ class Profile(models.Model):
 	year = models.IntegerField(choices=YEAR_CHOICES)
 	is_dual_degree = models.BooleanField(default=False)
 	single_branch = models.CharField(max_length=100,choices=SINGLE_DEGREE_BRANCH_CHOICES, null=True)
-	dual_branch = models.CharField(max_length=100,choices=DUAL_DEGREE_BRANCH_CHOICES,null=True)
+	dual_branch = models.CharField(max_length=100,choices=DUAL_DEGREE_BRANCH_CHOICES,null=True,blank=True)
 	new_bitsian = models.BooleanField(null=True,default=True) # Keep None for incoming batch.
 	hostel = models.CharField(max_length=100,choices=HOSTELS,null=False)
 	room_no = models.IntegerField(null=True)
