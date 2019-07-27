@@ -710,7 +710,8 @@ def SellerDetails(request, seller_id):
 
     payload = {
         "description": seller.description,
-        "details": seller.details
+        "details": seller.details,
+        "tags": seller.tags.split('~')
     }
 
     books = BookInstance.objects.filter(seller=seller)
