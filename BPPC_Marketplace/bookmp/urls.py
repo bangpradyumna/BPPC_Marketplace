@@ -1,15 +1,21 @@
-from . import views
+from bookmp.views.auth import login, signup
+from bookmp.views.trade import buy, sell
+from bookmp.views import miscellaneous
 from django.urls import include, path
 
-urlpatterns=[
+urlpatterns = [
 
-    path('auth/login/', views.login, name='login'),   
-    path('auth/signup/', views.signup, name='signup'),
-    path('auth/confirm_email/<str:unique_code>', views.confirm_email, name="confirm_email"),
+    path('auth/login/', login.login, name='login'),
+    path('auth/signup/', signup.signup, name='signup'),
+    path('auth/confirm_email/<str:unique_code>',
+         miscellaneous.confirm_email, name="confirm_email"),
 
-    path('sell/', views.sell, name='sell'),
-    path('SellerList/', views.SellerList, name='SellerList'),
-    path('SellerDetails/<int:seller_id>/', views.SellerDetails, name='SellerDetails'),
-    path('DetailsCollection/', views.DetailsCollection, name='DetailsCollection'),
+    path('sell/', sell.sell, name='sell'),
 
-]    
+    path('SellerList/', buy.SellerList, name='SellerList'),
+    path('SellerDetails/<int:seller_id>/',
+         buy.SellerDetails, name='SellerDetails'),
+    path('DetailsCollection/', miscellaneous.DetailsCollection,
+         name='DetailsCollection'),
+
+]
