@@ -6,7 +6,7 @@ def disable_unconfirmed_email_users(inner_func):
     def wrapped_function(request, *args, **kwargs):
         current_profile = Profile.objects.get(user=request.user)
         if current_profile.is_email_confirmed:
-            return func
+            return inner_func
         else:
             return Response({
                 'detail': 'Email not verified',
