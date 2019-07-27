@@ -20,10 +20,10 @@ from bookmp.decorators import disable_unconfirmed_email_users
 
 CURRENT_YEAR = 2019
 
+
 @csrf_exempt
 @api_view(['GET'])
 @permission_classes((IsAuthenticated,))
-@disable_unconfirmed_email_users
 def SellerList(request):
 
     user = request.user
@@ -98,10 +98,10 @@ def SellerList(request):
     response.delete_cookie('sessionid')
     return response
 
+
 @permission_classes((IsAuthenticated,))
 @csrf_exempt
 @api_view(['GET'])
-@disable_unconfirmed_email_users
 def SellerDetails(request, seller_id):
     try:
         seller = Seller.objects.get(id=seller_id)

@@ -20,11 +20,10 @@ from bookmp.decorators import disable_unconfirmed_email_users
 CURRENT_YEAR = 2019
 
 
-@transaction.atomic
 @csrf_exempt
 @api_view(['POST', 'GET'])
 @permission_classes((IsAuthenticated,))
-@disable_unconfirmed_email_users
+@transaction.atomic
 def sell(request):
 
     user = request.user
