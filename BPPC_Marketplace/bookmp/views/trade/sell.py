@@ -168,7 +168,7 @@ def sell(request):
             payload = {
                 "details": "",
                 "description": "",
-                "tags": "",
+                "tags": [],
                 "price": "",
                 "images": []
             }
