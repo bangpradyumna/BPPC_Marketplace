@@ -52,6 +52,7 @@ def sell(request):
             seller.description = request.data['description']
             seller.price = int(request.data['price'])
 
+            tags = ''
             for tag in request.data['tags']:
                 try:
                     tags = tags + '~' + str(tag)
@@ -154,7 +155,10 @@ def sell(request):
             }
 
             # Adding the list of tags.
-            payload['tags'] = seller.tags.split('~')
+            if seller.tags == '':
+                payload['tags'] = []
+            else:    
+                payload['tags'] = seller.tags.split('~')
 
             # Adding the image urls.
             images = Image.objects.get(seller=seller)
