@@ -98,7 +98,7 @@ class Seller(models.Model):
     is_listed = models.BooleanField(default=True)
     details = models.CharField(max_length=200)
     description = models.TextField()
-    price = models.IntegerField()
+    price = models.IntegerField(null=True)
 
     # Tags stored in a single string, separated by '~'.
     tags = models.CharField(max_length=100)
