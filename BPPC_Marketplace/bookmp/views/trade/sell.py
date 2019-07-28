@@ -65,6 +65,14 @@ def sell(request):
             seller.tags = tags  # A single string of tags, separated by '~'.
             seller.save()
 
+            # Previously selected books.
+            old_books = BookInstance.objects.filter(seller=seller)
+
+            # From the old books, remove the ones not selected anymore.
+            for book in old_books:
+                if not str(book.book_class.id) in request.data['book_ids']:
+                    book.delete() 
+
             for Id in request.data['book_ids']:
                 try:
                     book_class = BookClass.objects.get(id=int(Id))
