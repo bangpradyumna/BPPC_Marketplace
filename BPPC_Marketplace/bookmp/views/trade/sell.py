@@ -1,4 +1,5 @@
 import re
+import os
 
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
@@ -96,21 +97,25 @@ def sell(request):
                     new_book_instance.seller = seller
                     new_book_instance.save()
 
-                    with transaction.atomic():  # Delete old images to avoid duplicates.
+            with transaction.atomic():  # Delete images that the user removed.
+                
+                deleted_ids=[]
+                for Id in request.data['deleted_image_ids']:
+                    deleted_ids.append(int(Id))
 
-                        images = Image.objects.filter(seller=seller)
-                        for image in images:
-                            image.delete()
-                            # The actual image file is deleted using signals.
-                            # SEE: models.auto_delete_file_on_delete()
+                images = Image.objects.filter(id__in=deleted_ids)
+                for image in images:
+                    image.delete()
+                    # The actual image file is deleted using signals.
+                    # SEE: models.auto_delete_file_on_delete()
 
-                        for filename, file in request.FILES.items():
-                            # Adding the new images.
-                            image_object = Image()
-                            image_object.seller = seller
-                            img = request.FILES[filename]
-                            image_object.img = img
-                            image_object.save()
+                for filename, file in request.FILES.items():
+                    # Adding the new images.
+                    image_object = Image()
+                    image_object.seller = seller
+                    img = request.FILES[filename]
+                    image_object.img = img
+                    image_object.save()
 
             message = "Submitted successfully!"
             detail_message = "Success."
@@ -177,6 +182,8 @@ def sell(request):
             for image in images:
                 img_dict = {}
                 img_dict['url'] = image.img.url
+                img_dict['name'] = os.path.basename(image.img.name) # Name of the file
+                img_dict['id'] = image.id
                 payload['images'].append(img_dict)
 
 
