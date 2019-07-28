@@ -145,7 +145,8 @@ class Course(models.Model):
     year = models.IntegerField(choices=YEAR_CHOICES, null=True)
     branch = models.CharField(
         max_length=100, choices=BRANCH_CHOICES, blank=True)
-    is_elective = models.BooleanField(default=False)
+    is_humanities_elective = models.BooleanField(default=False)
+    is_department_elective = models.BooleanField(default=False)
 
     def __str__(self):
         return self.code + ' : ' + self.name
