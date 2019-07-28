@@ -256,6 +256,8 @@ def sell(request):
             for book in selected_books:
                 book_dict = {}
                 book_dict['id'] = str(book.book_class.id)
+                book_dict['title'] = book.book_class.name
+                book_dict['category'] = book.book_class.course.name
                 payload['selected_books'].append(book_dict)
         except:
             payload['selected_books'] = []
