@@ -52,12 +52,15 @@ def sell(request):
             seller.description = request.data['description']
             seller.price = int(request.data['price'])
 
-            tags = ''
-            for tag in request.data['tags']:
-                try:
-                    tags = tags + '~' + str(tag)
-                except:
-                    tags = str(tag)
+            if not request.data['tags']: 
+                # If there is no tag.
+                tags = ''
+            else:    
+                for tag in request.data['tags']:
+                    try:
+                        tags = tags + '~' + str(tag)
+                    except:
+                        tags = str(tag)
 
             seller.tags = tags  # A single string of tags, separated by '~'.
             seller.save()
@@ -161,14 +164,15 @@ def sell(request):
                 payload['tags'] = seller.tags.split('~')
 
             # Adding the image urls.
-            images = Image.objects.get(seller=seller)
+            images = Image.objects.filter(seller=seller)
             payload['images'] = []
             for image in images:
                 img_dict = {}
                 img_dict['url'] = image.img.url
                 payload['images'].append(img_dict)
 
-        except:
+
+        except Seller.DoesNotExist:
             payload = {
                 "details": "",
                 "description": "",
