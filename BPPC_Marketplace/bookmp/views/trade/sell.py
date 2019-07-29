@@ -19,7 +19,7 @@ from bookmp.utils import (BOYS_HOSTEL, DUAL_DEGREE_BRANCHES, GIRLS_HOSTEL, HOSTE
 from bookmp.decorators import disable_unconfirmed_email_users
 
 CURRENT_YEAR = 2019
-
+DOMAIN_NAME = 'https://market.bits-dvm.org'
 
 @csrf_exempt
 @api_view(['POST', 'GET'])
@@ -188,7 +188,7 @@ def sell(request):
             payload['images'] = []
             for image in images:
                 img_dict = {}
-                img_dict['url'] = image.img.url
+                img_dict['url'] = DOMAIN_NAME + image.img.url
                 img_dict['name'] = os.path.basename(image.img.name) # Name of the file
                 img_dict['id'] = image.id
                 payload['images'].append(img_dict)
