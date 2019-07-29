@@ -10,7 +10,7 @@ from google.auth.transport import requests as google_requests
 from google.oauth2 import id_token as googleIdToken
 from rest_framework.decorators import api_view, permission_classes, parser_classes
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.parsers import MultiPartParser
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.response import Response
 
 from bookmp.models import BookClass, BookInstance, Course, Image, Profile, Seller
@@ -25,7 +25,7 @@ DOMAIN_NAME = 'https://market.bits-dvm.org'
 @csrf_exempt
 @api_view(['POST', 'GET'])
 @permission_classes((IsAuthenticated,))
-@parser_classes([MultiPartParser]) # For image uploads.
+@parser_classes([JSONParser, FormParser, MultiPartParser]) # For image uploads.
 @transaction.atomic
 def sell(request):
 
