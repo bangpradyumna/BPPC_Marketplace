@@ -1,6 +1,5 @@
 import re
 import os
-import PIL.Image as PILimage
 
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
@@ -124,8 +123,7 @@ def sell(request):
                 for image in request.data['images']:
                     image_object = Image()
                     image_object.seller = seller
-                    img = PILimage.open(image)
-                    image_object.img = img
+                    image_object.img = image
                     image_object.save()
 
             message = "Submitted successfully!"
