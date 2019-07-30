@@ -124,8 +124,8 @@ def sell(request):
                 for image in request.data['images']:
                     image_object = Image()
                     image_object.seller = seller
-                    PILimage = PILimage.open(image)
-                    image_object.img = PILimage
+                    img = PILimage.open(image)
+                    image_object.img = img
                     image_object.save()
 
             message = "Submitted successfully!"
