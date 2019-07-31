@@ -86,6 +86,7 @@ class Profile(models.Model):
     # For email confirmation.
     unique_code = models.CharField(default="lolmao", max_length=10)
     is_email_confirmed = models.BooleanField(default=False)
+    phone = models.CharField(max_length=12, null=True, blank=True)
 
     def __str__(self):
         return 'Profile for user {} with ID: {}'.format(self.user.username, self.bits_id)
@@ -99,6 +100,7 @@ class Seller(models.Model):
     details = models.CharField(max_length=200)
     description = models.TextField()
     price = models.IntegerField(null=True)
+    times_viewed = models.IntegerField(null=True)
 
     # Tags stored in a single string, separated by '~'.
     tags = models.CharField(max_length=100)
