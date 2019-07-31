@@ -41,19 +41,19 @@ def DetailsCollection(request):
 
         phone = int(request.data["phone"])
         bits_id = str(request.data["bits_id"])
-        if int(bits_id[0:4]) == 2019:
-            message = "Your BITS ID cannot start with '2019'"
-            detail_message = "The bits_id started with '2019'"
+        if not re.match(r'^20\d\d[AB]\dPS\d\d\d\d[PT]$', bits_id):
+            message = "Not a valid ID"
+            detail_message = "ID doesn't comply with regex."
             payload = {
                 "detail": detail_message,
                 "display_message": message
             }
             response = Response(payload, status=400)
             return response
-
-        if not re.match(r'^20\d\d[AB]\dPS\d\d\d\d[PT]$', bits_id):
-            message = "Not a valid ID"
-            detail_message = "ID doesn't comply with regex."
+        
+        if int(bits_id[0:4]) == 2019:
+            message = "Your BITS ID cannot start with '2019'"
+            detail_message = "The bits_id started with '2019'"
             payload = {
                 "detail": detail_message,
                 "display_message": message
