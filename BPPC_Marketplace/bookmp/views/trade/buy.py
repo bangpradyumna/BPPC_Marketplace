@@ -50,7 +50,7 @@ def SellerList(request):
     seniors_same_branch = Seller.objects.filter(profile__year=year+1,
                                                 profile__single_branch=single_branch,
                                                 profile__dual_branch=dual_branch,
-                                                is_listed=True)
+                                                is_listed=True).order_by('times_viewed')
 
     # Number of books in the seller's year and branch(es).
     book_count_total = BookClass.objects.filter(course__branch__in=[single_branch, dual_branch],
@@ -78,7 +78,7 @@ def SellerList(request):
     if profile.year == 1:
         seniors_different_branch = Seller.objects.filter(is_listed=True,
                                                          profile__year=year+1).exclude(profile__single_branch=single_branch,
-                                                                                       profile__dual_branch=dual_branch)
+                                                                                       profile__dual_branch=dual_branch).order_by('times_viewed')
         for seller in seniors_different_branch:
             seller_dict = {}
             seller_dict['id'] = seller.id
@@ -132,7 +132,9 @@ def SellerDetails(request, seller_id):
     payload = {
         "description": seller.description,
         "details": seller.details,
-        "tags": seller.tags.split('~')
+        "tags": seller.tags.split('~'),
+        "phone": seller.profile.phone,
+        "email": seller.profile.user.email
     }
 
     books = BookInstance.objects.filter(seller=seller)
@@ -146,6 +148,13 @@ def SellerDetails(request, seller_id):
     payload['images'] = []
     for image in images:
         payload['images'].append(image.img.url)
+
+    if seller.times_viewed == None:
+        seller.times_viewed = 1
+    else:
+        seller.times_viewed = seller.times_viewed + 1
+
+    seller.save()
 
     response = Response(payload, status=200)
     response.delete_cookie('sessionid')
