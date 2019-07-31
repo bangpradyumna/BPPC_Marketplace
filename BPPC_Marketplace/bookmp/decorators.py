@@ -2,7 +2,7 @@ from .models import Profile
 from django.contrib.auth.models import User
 from rest_framework.response import Response
 
-def disable_unconfirmed_email_users(inner_func):
+def disallow_unconfirmed_email_users(inner_func):
     def wrapped_function(request, *args, **kwargs):
         current_profile = Profile.objects.get(user=request.user)
         if current_profile.is_email_confirmed:

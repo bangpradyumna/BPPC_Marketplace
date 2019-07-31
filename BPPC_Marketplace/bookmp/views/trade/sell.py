@@ -17,7 +17,8 @@ from bookmp.models import BookClass, BookInstance, Course, Image, Profile, Selle
 from bookmp.utils import (BOYS_HOSTEL, DUAL_DEGREE_BRANCHES, GIRLS_HOSTEL, HOSTELS,
                           SINGLE_DEGREE_BRANCHES, generate_random_password,
                           get_jwt_with_user)
-from bookmp.decorators import disable_unconfirmed_email_users
+
+from bookmp.decorators import disallow_unconfirmed_email_users
 
 CURRENT_YEAR = 2019
 DOMAIN_NAME = 'https://market.bits-dvm.org'
@@ -25,6 +26,7 @@ DOMAIN_NAME = 'https://market.bits-dvm.org'
 @csrf_exempt
 @api_view(['POST', 'GET'])
 @permission_classes((IsAuthenticated,))
+@disallow_unconfirmed_email_users
 @parser_classes([JSONParser, FormParser, MultiPartParser]) # For image uploads.
 @transaction.atomic
 def sell(request):
@@ -35,6 +37,17 @@ def sell(request):
     except User.profile.RelatedObjectDoesNotExist:
         message = "Profile does not exist."
         detail_message = "Profile object for this user does not exist."
+        payload = {
+            "detail": detail_message,
+            "display_message": message
+        }
+        response = Response(payload, status=400)
+        response.delete_cookie('sessionid')
+        return response
+
+    if profile.year == 1:
+        message = "2019 batch is not allowed to access the sell page."
+        detail_message = "The 'year' field for this user is set to 1."
         payload = {
             "detail": detail_message,
             "display_message": message
@@ -159,17 +172,6 @@ def sell(request):
             return response
 
     elif request.method == 'GET':
-
-        if profile.year == 1:
-            message = "2019 batch is not allowed to access the sell page."
-            detail_message = "The 'year' field for this user is set to 1."
-            payload = {
-                "detail": detail_message,
-                "display_message": message
-            }
-            response = Response(payload, status=400)
-            response.delete_cookie('sessionid')
-            return response
 
         try:
             seller = profile.seller

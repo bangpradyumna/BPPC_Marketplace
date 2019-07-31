@@ -16,7 +16,7 @@ from bookmp.utils import (BOYS_HOSTEL, DUAL_DEGREE_BRANCHES, GIRLS_HOSTEL, HOSTE
                           SINGLE_DEGREE_BRANCHES, generate_random_password,
                           get_jwt_with_user)
 
-from bookmp.decorators import disable_unconfirmed_email_users
+from bookmp.decorators import disallow_unconfirmed_email_users
 
 CURRENT_YEAR = 2019
 
@@ -24,6 +24,7 @@ CURRENT_YEAR = 2019
 @csrf_exempt
 @api_view(['GET'])
 @permission_classes((IsAuthenticated,))
+@disallow_unconfirmed_email_users
 def SellerList(request):
 
     user = request.user
@@ -101,6 +102,7 @@ def SellerList(request):
 
 @permission_classes((IsAuthenticated,))
 @csrf_exempt
+@disallow_unconfirmed_email_users
 @api_view(['GET'])
 def SellerDetails(request, seller_id):
     try:
