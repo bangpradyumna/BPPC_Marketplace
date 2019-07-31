@@ -40,6 +40,16 @@ def DetailsCollection(request):
             return response
 
         phone = int(request.data["phone"])
+        if not len(request.data["phone"]) == 10:
+            message = "Invalid phone number."
+            detail_message = "Phone number should be of length 10."
+            payload = {
+                "detail": detail_message,
+                "display_message": message
+            }
+            response = Response(payload, status=400)
+            return response
+
         bits_id = str(request.data["bits_id"])
         if not re.match(r'^20\d\d[AB]\dPS\d\d\d\d[PT]$', bits_id):
             message = "Not a valid ID"
@@ -162,6 +172,7 @@ def DetailsCollection(request):
             profile.new_bitsian = False
             profile.hostel = hostel
             profile.room_no = room_no
+            profile.phone = phone
             profile.save()
 
             message = "Details submitted succesfully!"

@@ -58,6 +58,16 @@ def signup(request):
             return response
 
         phone = int(request.data["phone"])
+        if not len(request.data["phone"]) == 10:
+            message = "Invalid phone number."
+            detail_message = "Phone number should be of length 10."
+            payload = {
+                "detail": detail_message,
+                "display_message": message
+            }
+            response = Response(payload, status=400)
+            return response
+
         bits_id = str(request.data["bits_id"])
         if int(bits_id[0:4]) != 2019:
             message = "Your BITS ID can start only with '2019'"
@@ -194,7 +204,8 @@ def signup(request):
                 hostel=hostel,
                 room_no=room_no,
                 is_email_confirmed=False,
-                unique_code=unique_code
+                unique_code=unique_code,
+                phone = phone
             )
             signup_completion_status = 200
             try:
