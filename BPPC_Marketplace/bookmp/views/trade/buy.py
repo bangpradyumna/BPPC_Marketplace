@@ -100,10 +100,10 @@ def SellerList(request):
     return response
 
 
-@permission_classes((IsAuthenticated,))
 @csrf_exempt
-@disallow_unconfirmed_email_users
 @api_view(['GET'])
+@permission_classes((IsAuthenticated,))
+@disallow_unconfirmed_email_users
 def SellerDetails(request, seller_id):
     try:
         seller = Seller.objects.get(id=seller_id)
