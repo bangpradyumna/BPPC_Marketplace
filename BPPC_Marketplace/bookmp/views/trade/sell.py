@@ -132,12 +132,24 @@ def sell(request):
                 #     image_object.img = img
                 #     image_object.save()
 
-                # Adding the new images.                
-                for image in request.data['images']:
-                    image_object = Image()
-                    image_object.seller = seller
-                    image_object.img = image
-                    image_object.save()
+                # Adding the new images.  
+                x = 1
+                while True:
+                    try:
+                        request_string = 'image-' + str(x)
+                        current_image = request.FILES.get[request_string]
+                        image_object = Image()
+                        image_object.seller = seller
+                        image_object.img = current_image
+                        image_object.save()
+                    except:
+                        break
+
+                # for image in request.data['images']:
+                #     image_object = Image()
+                #     image_object.seller = seller
+                #     image_object.img = image
+                #     image_object.save()
 
             message = "Submitted successfully!"
             detail_message = "Success."
