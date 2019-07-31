@@ -125,9 +125,11 @@ def sell(request):
                 deleted_ids = []
                 deleted_id_list = request.data['deleted_image_ids'].split(
                     ',')
-                for Id in deleted_id_list:
-                    Id = Id.strip()
-                    deleted_ids.append(int(Id))
+
+                if deleted_id_list != ['']:
+                    for Id in deleted_id_list:
+                        Id = Id.strip()
+                        deleted_ids.append(int(Id))
 
                 images = Image.objects.filter(id__in=deleted_ids)
                 for image in images:
