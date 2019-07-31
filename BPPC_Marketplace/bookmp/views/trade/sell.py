@@ -135,6 +135,7 @@ def sell(request):
                 # Adding the new images.  
                 request_string = 'images-1'
                 current_image = request.FILES.get(request_string)
+                print(request.FILES)
                 image_object = Image()
                 image_object.seller = seller
                 image_object.img = current_image
