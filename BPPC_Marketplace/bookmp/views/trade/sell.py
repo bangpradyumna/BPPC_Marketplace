@@ -137,7 +137,7 @@ def sell(request):
                 while True:
                     try:
                         request_string = 'image-' + str(x)
-                        current_image = request.FILES.get[request_string]
+                        current_image = request.FILES.get(request_string)
                         image_object = Image()
                         image_object.seller = seller
                         image_object.img = current_image
