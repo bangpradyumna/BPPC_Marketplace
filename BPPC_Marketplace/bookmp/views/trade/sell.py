@@ -126,15 +126,14 @@ def sell(request):
 
                 # Adding the new images.  
                 # request_string = 'images-1'
-                length = len(request.FILES) - 6
-                for i in range(length):
-                    request_string = "images-" + str(i)
-                    current_image = request.FILES.get(request_string)
+
+                for filename, file in request.FILES.items():
+                    name = request.FILES[filename].name
+                    current_image = request.FILES.get(name)
                     image_object = Image()
                     image_object.seller = seller
                     image_object.img = current_image
                     image_object.save()
-                    
                 # Image.objects.create(
                 #     seller=seller,
                 #     img=current_image
