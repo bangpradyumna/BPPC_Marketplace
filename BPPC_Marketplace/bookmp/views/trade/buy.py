@@ -142,7 +142,7 @@ def SellerDetails(request, seller_id):
         payload['books'].append(book.book_class.name)
 
     # Adding the image urls.
-    images = Image.objects.get(seller=seller)
+    images = Image.objects.filter(seller=seller)
     payload['images'] = []
     for image in images:
         payload['images'].append(image.img.url)
