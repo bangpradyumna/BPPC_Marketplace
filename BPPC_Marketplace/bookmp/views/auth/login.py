@@ -160,6 +160,7 @@ def login(request):
                 # Or we can just ask the user for his year.
                 # CURRENT_YEAR variable must be be set on the top of this file.
                 profile.year = CURRENT_YEAR - int(email[1:5]) + 1
+                profile.is_email_confirmed = True
                 profile.save()
 
             try:
