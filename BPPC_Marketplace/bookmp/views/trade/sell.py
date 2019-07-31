@@ -94,8 +94,9 @@ def sell(request):
                     book.delete()
 
             book_id_list = request.data['book_ids'].split(
-                ',').trim()
+                ',')
             for Id in book_id_list:
+                Id = Id.trim()
                 try:
                     book_class = BookClass.objects.get(id=int(Id))
                 except BookClass.DoesNotExist:
