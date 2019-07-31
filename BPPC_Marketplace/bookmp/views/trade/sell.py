@@ -75,8 +75,9 @@ def sell(request):
                 tags = ''
             else:
                 tag_list = request.data['tags'].split(
-                    ',').trim()
+                    ',')
                 for tag in tag_list:
+                    tag = tag.trim()
                     try:
                         tags = tags + '~' + str(tag)
                     except:
@@ -123,8 +124,9 @@ def sell(request):
 
                 deleted_ids = []
                 deleted_id_list = request.data['deleted_image_ids'].split(
-                    ',').trim()
+                    ',')
                 for Id in deleted_id_list:
+                    Id = Id.trim()
                     deleted_ids.append(int(Id))
 
                 images = Image.objects.filter(id__in=deleted_ids)
