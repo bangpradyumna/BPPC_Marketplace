@@ -41,7 +41,7 @@ def DetailsCollection(request):
 
         phone = int(request.data["phone"])
         bits_id = str(request.data["bits_id"])
-        if int(bits_id[1:5]) == 2019:
+        if int(bits_id[0:4]) == 2019:
             message = "Your BITS ID cannot start with '2019'"
             detail_message = "The bits_id started with '2019'"
             payload = {
