@@ -77,7 +77,7 @@ def sell(request):
                 tag_list = request.data['tags'].split(
                     ',')
                 for tag in tag_list:
-                    tag = tag.trim()
+                    tag = tag.strip()
                     try:
                         tags = tags + '~' + str(tag)
                     except:
@@ -97,7 +97,7 @@ def sell(request):
             book_id_list = request.data['book_ids'].split(
                 ',')
             for Id in book_id_list:
-                Id = Id.trim()
+                Id = Id.strip()
                 try:
                     book_class = BookClass.objects.get(id=int(Id))
                 except BookClass.DoesNotExist:
@@ -126,7 +126,7 @@ def sell(request):
                 deleted_id_list = request.data['deleted_image_ids'].split(
                     ',')
                 for Id in deleted_id_list:
-                    Id = Id.trim()
+                    Id = Id.strip()
                     deleted_ids.append(int(Id))
 
                 images = Image.objects.filter(id__in=deleted_ids)
