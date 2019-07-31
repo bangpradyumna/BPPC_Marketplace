@@ -23,11 +23,13 @@ from bookmp.decorators import disallow_unconfirmed_email_users
 CURRENT_YEAR = 2019
 DOMAIN_NAME = 'https://market.bits-dvm.org'
 
+
 @csrf_exempt
 @api_view(['POST', 'GET'])
 @permission_classes((IsAuthenticated,))
 @disallow_unconfirmed_email_users
-@parser_classes([JSONParser, FormParser, MultiPartParser]) # For image uploads.
+# For image uploads.
+@parser_classes([JSONParser, FormParser, MultiPartParser])
 @transaction.atomic
 def sell(request):
 
@@ -68,11 +70,13 @@ def sell(request):
             seller.description = request.data['description']
             seller.price = int(request.data['price'])
 
-            if not request.data['tags']: 
+            if not request.data['tags']:
                 # If there is no tag.
                 tags = ''
-            else:    
-                for tag in request.data['tags']:
+            else:
+                tag_list = request.data['tags'].split(
+                    ',').trim()
+                for tag in tag_list:
                     try:
                         tags = tags + '~' + str(tag)
                     except:
@@ -87,9 +91,11 @@ def sell(request):
             # From the old books, remove the ones not selected anymore.
             for book in old_books:
                 if not str(book.book_class.id) in request.data['book_ids']:
-                    book.delete() 
+                    book.delete()
 
-            for Id in request.data['book_ids']:
+            book_id_list = request.data['book_ids'].split(
+                ',').trim()
+            for Id in book_id_list:
                 try:
                     book_class = BookClass.objects.get(id=int(Id))
                 except BookClass.DoesNotExist:
@@ -113,9 +119,11 @@ def sell(request):
                     new_book_instance.save()
 
             with transaction.atomic():  # Delete images that the user removed.
-                
-                deleted_ids=[]
-                for Id in request.data['deleted_image_ids']:
+
+                deleted_ids = []
+                deleted_id_list = request.data['deleted_image_ids'].split(
+                    ',').trim()
+                for Id in deleted_id_list:
                     deleted_ids.append(int(Id))
 
                 images = Image.objects.filter(id__in=deleted_ids)
@@ -124,7 +132,7 @@ def sell(request):
                     # The actual image file is deleted using signals.
                     # SEE: models.auto_delete_file_on_delete()
 
-                # Adding the new images.  
+                # Adding the new images.
                 # request_string = 'images-1'
 
                 for filename, img_file in request.FILES.items():
@@ -183,7 +191,7 @@ def sell(request):
             # Adding the list of tags.
             if seller.tags == '':
                 payload['tags'] = []
-            else:    
+            else:
                 payload['tags'] = seller.tags.split('~')
 
             # Adding the image urls.
@@ -192,10 +200,10 @@ def sell(request):
             for image in images:
                 img_dict = {}
                 img_dict['url'] = DOMAIN_NAME + image.img.url
-                img_dict['name'] = os.path.basename(image.img.name) # Name of the file
+                img_dict['name'] = os.path.basename(
+                    image.img.name)  # Name of the file
                 img_dict['id'] = image.id
                 payload['images'].append(img_dict)
-
 
         except Seller.DoesNotExist:
             payload = {
@@ -208,33 +216,37 @@ def sell(request):
 
         try:
             year = profile.year
-            
-            # Three types of courses: 
+
+            # Three types of courses:
             # 1 - Courses for all branches.
             # 2 - Courses for single branches(B.E.)
-            # 3 - Courses for dual branches(M.Sc.) 
-            
+            # 3 - Courses for dual branches(M.Sc.)
+
             course_types = []
-            
+
             # Add courses that are for all branches.
-            all_branch_courses = Course.objects.filter(year=year-1, branch='ALL')
+            all_branch_courses = Course.objects.filter(
+                year=year-1, branch='ALL')
             course_types.append(all_branch_courses)
 
             # Add courses for dual branches.
             if profile.is_dual_degree:
-                dual_courses = Course.objects.filter(year=year-1, branch=profile.dual_branch)
+                dual_courses = Course.objects.filter(
+                    year=year-1, branch=profile.dual_branch)
                 course_types.append(dual_courses)
-                
+
                 # Add single branch courses for dualites.
                 # 'year-2' because dualites have single degree courses a year late.
                 if not profile.single_branch is None:
-                    single_courses = Course.objects.filter(year=year-2, branch=profile.single_branch)
+                    single_courses = Course.objects.filter(
+                        year=year-2, branch=profile.single_branch)
                     course_types.append(single_courses)
-            
+
             # Add courses for non-dualites.
             else:
                 if not profile.single_branch is None:
-                    single_courses = Course.objects.filter(year=year-1, branch=profile.single_branch)
+                    single_courses = Course.objects.filter(
+                        year=year-1, branch=profile.single_branch)
                     course_types.append(single_courses)
                 else:
                     message = "Error: No branch specified."
@@ -246,7 +258,6 @@ def sell(request):
                     response = Response(payload, status=400)
                     response.delete_cookie('sessionid')
                     return response
-
 
         except:
             message = "Error in fetching courses for you."
@@ -262,7 +273,7 @@ def sell(request):
         payload['books'] = []  # A list of books, inside every course_dict.
 
         for course_type in course_types:
-            
+
             for course in course_type:
 
                 books = course.books.all()
