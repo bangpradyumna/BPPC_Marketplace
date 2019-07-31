@@ -124,33 +124,19 @@ def sell(request):
                     # The actual image file is deleted using signals.
                     # SEE: models.auto_delete_file_on_delete()
 
-                # for filename, file in request.FILES.items():
-                #     # Adding the new images.
-                #     image_object = Image()
-                #     image_object.seller = seller
-                #     img = request.FILES[filename]
-                #     image_object.img = img
-                #     image_object.save()
-
                 # Adding the new images.  
                 # request_string = 'images-1'
-                current_image = request.FILES.get("images-0")
-                print(request.FILES)
+                for filename, file in request.FILES.iteritems():
+                    name = request.FILES[filename].name
+                    current_image = request.FILES.get(name)
+                    image_object = Image()
+                    image_object.seller = seller
+                    image_object.img = current_image
+                    image_object.save()
                 # Image.objects.create(
                 #     seller=seller,
                 #     img=current_image
                 # )
-                image_object = Image()
-                image_object.seller = seller
-                image_object.img = current_image
-                image_object.save()
-
-                # for image in request.data['images']:
-                #     image_object = Image()
-                #     image_object.seller = seller
-                #     image_object.img = image
-                #     image_object.save()
-
             message = "Submitted successfully!"
             detail_message = "Success."
             payload = {
