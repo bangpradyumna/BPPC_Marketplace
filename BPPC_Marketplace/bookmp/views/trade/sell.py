@@ -79,8 +79,8 @@ def sell(request):
             seller.details = request.data['details']
             
             if len(request.data['description']) > 4000:
-                message = "Please limit description to 200 characters"
-                detail_message = "'dsecription' field should be less than 200 characters."
+                message = "Please limit description to 4000 characters"
+                detail_message = "'dsecription' field should be less than 4000 characters."
                 payload = {
                     "detail": detail_message,
                     "display_message": message
