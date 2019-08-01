@@ -182,19 +182,19 @@ def login(request):
             response.delete_cookie('sessionid')
             return response
 
-    if user.profile.new_bitsian:
-        new_bitsian = True  # Copying variable for sending api response
-        user.profile.new_bitsian = False
-        user.profile.save()
-    else:
-        new_bitsian = False
+    # if user.profile.new_bitsian:
+    #     new_bitsian = True  # Copying variable for sending api response
+    #     user.profile.new_bitsian = False
+    #     user.profile.save()
+    # else:
+    #     new_bitsian = False
 
     payload = {
         "JWT": get_jwt_with_user(user),
         "user_id": user.id,
         "name": user.first_name + ' ' + user.last_name,
         "email": user.email,
-        "new_bitsian": new_bitsian,
+        "new_bitsian": user.profile.new_bitsian,
         "bitsian_id": user.profile.bits_id,
     }
 
