@@ -118,29 +118,30 @@ def sell(request):
 
             book_id_list = request.data['book_ids'].split(
                 ',')
-            for Id in book_id_list:
-                Id = Id.strip()
-                try:
-                    book_class = BookClass.objects.get(id=int(Id))
-                except BookClass.DoesNotExist:
-                    message = "Not a valid book."
-                    detail_message = "BookClass with id " + Id + " not found in database."
-                    payload = {
-                        "detail": detail_message,
-                        "display_message": message
-                    }
-                    response = Response(payload, status=400)
-                    response.delete_cookie('sessionid')
-                    return response
+            if book_id_list != ['']:
+                for Id in book_id_list:
+                    Id = Id.strip()
+                    try:
+                        book_class = BookClass.objects.get(id=int(Id))
+                    except BookClass.DoesNotExist:
+                        message = "Not a valid book."
+                        detail_message = "BookClass with id " + Id + " not found in database."
+                        payload = {
+                            "detail": detail_message,
+                            "display_message": message
+                        }
+                        response = Response(payload, status=400)
+                        response.delete_cookie('sessionid')
+                        return response
 
-                try:
-                    BookInstance.objects.get(
-                        seller=seller, book_class=book_class)
-                except:
-                    new_book_instance = BookInstance()
-                    new_book_instance.book_class = book_class
-                    new_book_instance.seller = seller
-                    new_book_instance.save()
+                    try:
+                        BookInstance.objects.get(
+                            seller=seller, book_class=book_class)
+                    except:
+                        new_book_instance = BookInstance()
+                        new_book_instance.book_class = book_class
+                        new_book_instance.seller = seller
+                        new_book_instance.save()
 
             with transaction.atomic():  # Delete images that the user removed.
 
