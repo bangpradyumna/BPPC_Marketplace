@@ -66,8 +66,30 @@ def sell(request):
             seller.profile = profile
 
         try:
+            if len(request.data['details']) > 200:
+                message = "Please limit details to 200 characters"
+                detail_message = "'details' field should be less than 200 characters."
+                payload = {
+                    "detail": detail_message,
+                    "display_message": message
+                }
+                response = Response(payload, status=400)
+                response.delete_cookie('sessionid')
+                return response
             seller.details = request.data['details']
+            
+            if len(request.data['description']) > 4000:
+                message = "Please limit description to 200 characters"
+                detail_message = "'dsecription' field should be less than 200 characters."
+                payload = {
+                    "detail": detail_message,
+                    "display_message": message
+                }
+                response = Response(payload, status=400)
+                response.delete_cookie('sessionid')
+                return response
             seller.description = request.data['description']
+            
             seller.price = int(request.data['price'])
 
             if not request.data['tags']:
